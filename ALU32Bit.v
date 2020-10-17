@@ -81,90 +81,115 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// ADDITION, add, lw, sw, lb, sb, lh, sh         
+			// ADDITION, add, addi, lw, sw, lb, sb, lh, sh         
 			5'b00010: begin 
 					ALUResult[31:0] <= A + B;	
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// LEFT SHIFT, SLL, SLLV	
-			5'b00011: ALUResult <= A << B;  		   
-
-			// RIGHT SHIFT, SRL, SRLV, SRA, SRAV		 
-			5'b00100: ALUResult <= A >> B;         		
-
-			// MULTIPLICATION -> MUL, MULT, MULTU		
-			5'b00101: ALUResult <= A * B;	
-
-			// SUBTRACTION, BEQ, BNE          
-			5'b00110: begin  
-					ALUResult[31:0] <= A - B;	 
+			// ADDITION, addu, addui    FIX BY TYPECASTING   
+			5'b00011: begin 
+					ALUResult[31:0] <= A + B;	
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// SET LESS THAN, BLTZ, BGEZ, SLTIU, SLTU  
-			5'b00111: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
+			// SUBTRACTION, SUB, BEQ, BNE          
+			5'b00100: begin  
+					ALUResult[31:0] <= A - B;	 
+					ALUResult[63:32] <= 0;
+				  end 
+			// SUBTRACTION, SUBU 		    FIX BY TYPECASTING         
+			5'b00101: begin  
+					ALUResult[31:0] <= A - B;	 
+					ALUResult[63:32] <= 0;
+				  end
+
+			// LEFT SHIFT, SLL, SLLV	
+			5'b00110: ALUResult <= A << B;  		   
+
+			// RIGHT SHIFT, SRL, SRLV, SRA, SRAV		 
+			5'b00111: ALUResult <= A >> B;         		
+
+			// MULTIPLICATION -> MUL, MULT	
+			5'b01000: ALUResult <= A * B;	
+
+			// MULTIPLICATION -> MULTU		    FIX BY TYPECASTING  
+			5'b01001: ALUResult <= A * B;	
+
+			 
+
+			// SET LESS THAN, BLTZ, BGEZ 
+			5'b01010: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
+
+			// SET LESS THAN, SLTIU, SLTU  		    FIX BY TYPECASTING 
+			5'b01011: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
 
 			// NOR 		 
-			5'b01000: begin
+			5'b01100: begin
 					ALUResult[31:0] <= ~(A | B);	
 					ALUResult[63:32] <= 0;
 				  end
 
 			// XOR, XORI        
-			5'b01001: begin 
+			5'b01101: begin 
 					ALUResult[31:0] <= A ^ B;	
 					ALUResult[63:32] <= 0;
 				  end 
 
 			// ROTR, ROTRV         
-			5'b01010: ALUResult <= {32'b0, {B[A-1:0] | B[31:A]}}; // need to check   
+			5'b01110: ALUResult <= {32'b0, {B[A-1:0] | B[31:A]}}; // need to check   
 
-			// DIVIDE                            
-			5'b01011: begin						
+			// DIVIDE, DIV                           
+			5'b01111: begin						
 					ALUResult[31:0] <= A / B;	// quotient
 					ALUResult[63:32] <= A % B;	// remainder
 				  end 
-
+			
+			// DIVIDE, DIVU          		    FIX BY TYPECASTING                  
+			5'b10000: begin						
+					ALUResult[31:0] <= A / B;	// quotient
+					ALUResult[63:32] <= A % B;	// remainder
+				  end 
+			
 			// MADD         
-			5'b01100: ALUResult <= ALUResult + A * B; 
+			5'b10001: ALUResult <= ALUResult + A * B; 
 
 			// MSUB         
-			5'b01101: ALUResult <= ALUResult - A * B;
+			5'b10010: ALUResult <= ALUResult - A * B;
 
 			// MOVZ         
-			5'b01110: ALUResult <= (B == 32'b0) ? A : 64'b0; // Need to double check that this performs as expected
+			5'b10011: ALUResult <= (B == 32'b0) ? A : 64'b0; // Need to double check that this performs as expected
 
 			// MOVN         
-			5'b01111: ALUResult <= (B == 32'b0) ? 64'b0 : A; // Need to double check that this performs as expected
+			5'b10100: ALUResult <= (B == 32'b0) ? 64'b0 : A; // Need to double check that this performs as expected
 
 			// MFHI           
-			5'b10000: ALUResult <= {32'b0, ALUResult[63:32]};
+			5'b10101: ALUResult <= {32'b0, ALUResult[63:32]};
 
 			// MTHI              
-			5'b10001: ALUResult[63:32] <= A;
+			5'b10110: ALUResult[63:32] <= A;
 
 			// MFLO
-			5'b10010: ALUResult <= {32'b0, ALUResult[31:0]};
+			5'b10111: ALUResult <= {32'b0, ALUResult[31:0]};
 
 			// MTLO
-			5'b10011: ALUResult[31:0] <= A;
+			5'b11000: ALUResult[31:0] <= A;
 
 			// LUI
-			5'b10100: begin						
+			5'b11001: begin						
 					ALUResult[31:16] <= B[15:0];
 					ALUResult[15:0] <= 16'b0;
 					ALUResult[63:32] <= 16'b0;
 				  end 
 
 			// SEB -> which is faster, concatenating or assigning?         
-			5'b10101: begin						
+			5'b11010: begin						
 					ALUResult[7:0] <= B[7:0];
 					ALUResult[63:8] <= 56'b0;
 				  end 
 
 			// SEH                 
-			5'b10110: begin						
+			5'b11011: begin						
 					ALUResult[15:0] <= B[15:0];
 					ALUResult[63:16] <= 48'b0;
 				  end 
