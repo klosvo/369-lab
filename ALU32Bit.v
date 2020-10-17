@@ -87,9 +87,9 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// ADDITION, addu, addui    FIX BY TYPECASTING   
+			// ADDITION, addu, addui   
 			5'b00011: begin 
-					ALUResult[31:0] <= A + B;	
+					ALUResult[31:0] <= signed'(A) + signed'(B);	
 					ALUResult[63:32] <= 0;
 				  end 
 
@@ -98,9 +98,9 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[31:0] <= A - B;	 
 					ALUResult[63:32] <= 0;
 				  end 
-			// SUBTRACTION, SUBU 		    FIX BY TYPECASTING         
+			// SUBTRACTION, SUBU       
 			5'b00101: begin  
-					ALUResult[31:0] <= A - B;	 
+					ALUResult[31:0] <= signed'(A) - signed'(B);	 
 					ALUResult[63:32] <= 0;
 				  end
 
@@ -113,16 +113,16 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 			// MULTIPLICATION -> MUL, MULT	
 			5'b01000: ALUResult <= A * B;	
 
-			// MULTIPLICATION -> MULTU		    FIX BY TYPECASTING  
-			5'b01001: ALUResult <= A * B;	
+			// MULTIPLICATION -> MULTU
+			5'b01001: ALUResult <= signed'(A) * signed'(B);	
 
 			 
 
 			// SET LESS THAN, BLTZ, BGEZ 
 			5'b01010: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
 
-			// SET LESS THAN, SLTIU, SLTU  		    FIX BY TYPECASTING 
-			5'b01011: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
+			// SET LESS THAN, SLTIU, SLTU
+			5'b01011: ALUResult <= (signed'(A) < signed'(B)) ? 1'd1 : 64'b0; // check to make sure this is right
 
 			// NOR 		 
 			5'b01100: begin
@@ -145,9 +145,9 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[63:32] <= A % B;	// remainder
 				  end 
 			
-			// DIVIDE, DIVU          		    FIX BY TYPECASTING                  
+			// DIVIDE, DIVU                 
 			5'b10000: begin						
-					ALUResult[31:0] <= A / B;	// quotient
+					ALUResult[31:0] <= signed'(A) / signed'(B);	// quotient
 					ALUResult[63:32] <= A % B;	// remainder
 				  end 
 			
