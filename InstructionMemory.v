@@ -49,9 +49,18 @@ module InstructionMemory(Address, Instruction);
     
          initial begin                   //need to initalize this for the code!!!
             
-            for(i=0; i<128; i=i+1) begin
-                memory[i] <= i*3;     
-            end
+            memory[0] <= 32'b00100000000010000000000000000101;	//	main:	addi	$t0, $zero, 5
+            memory[1] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[2] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[3] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[4] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[5] <= 32'b00100000000010010000000000000100;	//		addi	$t1, $zero, 4
+            memory[6] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[7] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[8] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[9] <= 32'b00000000000000000000000000000000;	//		nop
+            memory[10] <= 32'b00000001000010010101000000100000;	//		add	$t2, $t0, $t1
+            memory[11] <= 32'b00000011111000000000000000001000;	//		jr	$ra
         
         /*
             //  TASK 3
@@ -125,7 +134,8 @@ module InstructionMemory(Address, Instruction);
 //           memory[12] = 32'h2008001d;	//	label2:	addi	$t0, $zero, 29
         end
         
-        always @ * begin
+        always @ (Address) begin
+        if (Address < 12)
             Instruction <= memory[Address[8:2]];    
         end
 

@@ -26,7 +26,7 @@ module BranchAnd(Branch, Zero, PCSrc);
     
     output reg [1:0] PCSrc;
     
-    always @ (*)begin
+    always @ (Zero)begin
         PCSrc = {Branch[1], Branch[0] & Zero};
     end
     

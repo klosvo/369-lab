@@ -29,6 +29,8 @@ module ProgramCounter(Address, PCResult, Reset, Clk);
 	input [31:0] Address;
 	input Reset, Clk;
 
+  (* mark_debug = "true" *) wire [31:0] Debug_Program_Counter;
+   
 	output reg [31:0] PCResult;
 
     /* Please fill in the implementation here... */
@@ -40,7 +42,7 @@ module ProgramCounter(Address, PCResult, Reset, Clk);
     		PCResult <= Address;
     	end
     end
-
+assign Debug_Program_Counter = PCResult;
 
 endmodule
 

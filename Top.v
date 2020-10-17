@@ -23,6 +23,8 @@
 module Top(
     input Clk, Reset
     );
+    (* mark_debug = "true" *) wire [31:0] Debug_Write_To_Register; 
+    
     reg [31:0] PCAddAmount;
     wire NewClk;
     wire PCSrc;
@@ -60,7 +62,7 @@ module Top(
 	ProgramCounter counter(Address, PCResult, Reset, NewClk);
 	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
 	Mux32Bit2To1 PCSrcMux(Address, PCAddResult, BranchAddress, PCSrc); // TODO: hook up second source
-	
+	/*
 	// IF/ID
 	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, NewClk, IDRegPCAddResult, IDRegInstruction);
 
@@ -99,7 +101,8 @@ module Top(
                        
    // Write Back Stage
    Mux32Bit2To1 MemToRegMux(RegWriteData, MemoryOut, ALUOut, WBMemToReg);
+   assign Debug_Write_Register = RegWriteData;
    
-    
+    */
     
 endmodule
