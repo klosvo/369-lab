@@ -12,33 +12,45 @@
 // B: 32-Bit input port B.
 //
 // OUTPUTS:-
-// ALUResult: 32-Bit ALU result output.
+// ALUResult: 64-Bit ALU result output.
 // ZERO: 1-Bit output flag. 
 //
 // FUNCTIONALITY:-
 // Design a 32-Bit ALU, so that it supports all arithmetic operations 
 // needed by the MIPS instructions given in Labs5-8.docx document. 
-//   The 'ALUResult' will output the corresponding result of the operation 
-//   based on the 32-Bit inputs, 'A', and 'B'. 
-//   The 'Zero' flag is high when 'ALUResult' is '0'. 
-//   The 'ALUControl' signal should determine the function of the ALU 
-//   You need to determine the bitwidth of the ALUControl signal based on the number of 
-//   operations needed to support. 
+// 
+// The 'ALUResult' will output the corresponding result of the operation 
+// based on the 32-Bit inputs, 'A', and 'B'. 
+// The 'Zero' flag is high when 'ALUResult' is '0'. 
+// The 'ALUControl' signal should determine the function of the ALU 
+// You need to determine the bitwidth of the ALUControl signal based on the number of 
+// operations needed to support. 
 //
 // Op|'ALUControl' value | Description | Notes
 // ==========================
-// ADDITION       | 0000 | ALUResult = A + B
-// SUBRACTION     | 0001 | ALUResult = A - B
-// MULTIPLICATION | 0010 | ALUResult = A * B        (see notes below)
-// AND            | 0011 | ALUResult = A and B
-// OR             | 0100 | ALUResult = A or B
-// SET LESS THAN  | 0101 | ALUResult =(A < B)? 1:0  (see notes below)
-// SET EQUAL      | 0110 | ALUResult =(A=B)  ? 1:0
-// SET NOT EQUAL  | 0111 | ALUResult =(A!=B) ? 1:0
-// LEFT SHIFT     | 1000 | ALUResult = A << B       (see notes below)
-// RIGHT SHIFT    | 1001 | ALUResult = A >> B	    (see notes below)
-// COUNT ONES     | 1010 | ALUResult = A CLO        (see notes below)
-// COUNT ZEROS    | 1011 | ALUResult = A CLZ        (see notes below)
+// AND, ANDI            			| 00000 | ALUResult = A and B
+// OR, ORI, SEB, SEH    			| 00001 | ALUResult = A or B
+// ADDITION, lw, sw, lb, sb, lh, sh     	| 00010 | ALUResult = A + B
+// LEFT SHIFT, SLL, SLLV	    		| 00011 | ALUResult = A << B
+// RIGHT SHIFT, SRL, SRLV, SRA, SRAV     	| 00100 | ALUResult = A >> B
+// MULTIPLICATION, MUL, MULT, MULTU 		| 00101 | ALUResult = A * B
+// SUBRACTION, BEQ, BNE       			| 00110 | ALUResult = A - B
+// SET LESS THAN, BLTZ, BGEZ, SLTIU, SLTU  	| 00111 | ALUResult =(A < B)? 1:0
+// NOR   					| 01000 | ALUResult = ~(A or B)
+// XOR, XORI					| 01001 | ALUResult = A xor B
+// ROTR, ROTRV					| 01010 | Rotate B Right
+// DIVIDE					| 01011 | ALUResult = A / B
+// MADD						| 01100 | ALUResult = ALUResult + A * B
+// MSUB						| 01101 | ALUResult = ALUResult - A * B
+// MOVZ						| 01110 | if (B == 0), ALUResult = A, else ALUResult = 0;
+// MOVN						| 01111 | if (B == 0), ALUResult = 0, else ALUResult = A;
+// MFHI						| 10000 | Move ALUResultHI into the lower 32 bits of ALUResult;
+// MTHI						| 10001 | Move A into the upper 32 bits of ALUResult;
+// MFLO						| 10010 | Move ALUResultLO into the lower 32 bits of ALUResult;
+// MTLO						| 10011 | Move A into the lower 32 bits of ALUResult;
+// LUI						| 10100 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
+// SEB						| 10101 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
+// SEH						| 10110 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
 //
 ////////////////////////////////////////////////////////////////////////////////
 
