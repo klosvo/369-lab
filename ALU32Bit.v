@@ -42,33 +42,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
+module ALU32Bit(ALUControl, A, B, ALUResult, Zero, HI_Output, LO_Output);
 
-	input [3:0] ALUControl; 	// Control bits for ALU operation
+	input [4:0] ALUControl; 	// Control bits for ALU operation
                                 // you need to adjust the bitwidth as needed
 	input [31:0] A, B;	    	// Inputs
+	
     
 	output reg [31:0] ALUResult;	// 32 bit outputs
 	output reg Zero;	
-	output wire [31:0] Debug_HI, Debug_LO; 
+	
+	reg [31:0] RegOutput;
 	
 	reg [63:0] MultResult;
-
-	reg [31:0] HIReg, LOReg;  
-          		// Zero=1 if ALUResult == 0
-    assign Debug_HI = HIReg;
-    assign Debug_LO = ALUResult;
-    
+	reg regWrite;
+	
+	reg [31:0] HI_Input, LO_Input;
+	output wire [31:0] HI_Output, LO_Output;
+	
+	HiLoRegs hilo(HI_Input, LO_Input,regWrite, HI_Output, LO_Output);
+	
     initial begin
-        HIReg = 0;
-        LOReg = 0;
+        MultResult = 0;
+        regWrite = 0;
     end
 
     always @ (ALUControl, A, B) begin
 		Zero <= 0;
-		ALUResult = 32'h0; // ALUResult <= 32'h0;
-		HIReg <= 0;
-		LOReg <= 0;
+		HI_Input <= HI_Output;
+		LO_Input <= LO_Output;
+		regWrite = 0;
 
 		case(ALUControl)
 
@@ -87,7 +90,6 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 			// ADDITION, add, lw, sw, lb, sb, lh, sh         
 			5'b00010: begin 
 					ALUResult[31:0] <= A + B;
-					LOReg <= ALUResult;	
 				  end 
 
 			// LEFT SHIFT, SLL, SLLV	
@@ -98,9 +100,11 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 
 			// MULTIPLICATION -> MUL, MULT, MULTU		
 			5'b00101: begin
+			 regWrite = 1;
 			 MultResult <= A * B;
-			 ALUResult <= MultResult[31:0];
-			 HIReg <= MultResult[63:32];	
+			 #5;
+			 HI_Input <= MultResult[63:32];
+			 LO_Input <= MultResult[31:0];
             end
 			// SUBTRACTION, BEQ, BNE          
 			5'b00110: begin  
@@ -112,7 +116,7 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 
 			// NOR 		 
 			5'b01000: begin
-					ALUResult[31:0] <= ~(A | B);	
+					ALUResult <= ~(A | B);	
 				  end
 
 			// XOR, XORI        
@@ -123,11 +127,11 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 			// ROTR, ROTRV         
 			//5'b01010: ALUResult <= {32'b0, {B[A-1:0] | B[31:A]}}; // need to check   
 
-			// DIVIDE                            
-			5'b01011: begin						
-					ALUResult <= A / B;	// quotient
-					HIReg <= A % B;	// remainder
-				  end 
+//			// DIVIDE                            
+//			5'b01011: begin						
+//					ALUResult <= A / B;	// quotient
+//					HIReg <= A % B;	// remainder
+//				  end 
 
 			// MADD         
 			5'b01100: ALUResult <= ALUResult + A * B; 
@@ -148,7 +152,9 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 			5'b10001: ALUResult[63:32] <= A;
 
 			// MFLO
-			5'b10010: ALUResult <= {32'b0, ALUResult[31:0]};
+			5'b10010: begin 
+			     ALUResult <= LO_Output;
+			     end
 
 			// MTLO
 			5'b10011: ALUResult[31:0] <= A;
@@ -173,7 +179,6 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 				  end 
 		endcase
 
-        //LOReg <= ALUResult;
 		if (ALUResult == 0) begin
 			Zero <= 1;
 		end

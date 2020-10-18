@@ -27,7 +27,7 @@ module ALUControl(ALUOp, funct, ALUCtl
             5'b00000: // R-type
                 begin
                     case(funct)
-//                        2'd00: ALUCtl <= 5'b00011; // sll
+                          6'b000000: ALUCtl <= 5'b00011; // sll
 //                        2'd02: ALUCtl <= 5'b00100; // srl
 //                        2'd03: ALUCtl <= 5'b00100; // sra
 
@@ -44,27 +44,27 @@ module ALUControl(ALUOp, funct, ALUCtl
 
 //                        2'd16: ALUCtl <= 5'b10000; // mfhi
 //                        2'd17: ALUCtl <= 5'b10001; // mthi 
-//                        2'd18: ALUCtl <= 5'b10010; // mflo
+                            6'b010010: ALUCtl <= 5'b10010; // mflo
 //                        2'd19: ALUCtl <= 5'b10011; // mtlo
 
  
-//                        2'd24: ALUCtl <= 5'b00101; // mult   
+                            6'b011000: ALUCtl <= 5'b00101; // mult   
 //                        // 2'd25: ALUCtl <= 5'b00101; // multu
 //                        2'd26: ALUCtl <= 5'b01011; // div
 //                        // 2'd27: ALUCtl <= 5'b01011; // divu  
 
 
-                        6'b100000: ALUCtl <= 5'b00010; // add/addi	
+                            6'b100000: ALUCtl <= 5'b00010; // add/addi	
 //                        // 2'd33: ALUCtl <= 5'b00010; // addu/addiu  
-//                        2'd34: ALUCtl <= 5'b00110; // sub
+                            6'b100010: ALUCtl <= 5'b00110; // sub
 //                        // 2'd35: ALUCtl <= 5'b00110; // subu
 
-//                          2'd36: ALUCtl <= 5'b00000; // and/andi
-//                        2'd37: ALUCtl <= 5'b00001; // or/ori
-//                        2'd38: ALUCtl <= 5'b01001; // xor
-//                        2'd39: ALUCtl <= 5'b01000; // nor
+                          6'b100100: ALUCtl <= 5'b00000; // and/andi
+                          6'b100101: ALUCtl <= 5'b00001; // or/ori
+                          6'b100110: ALUCtl <= 5'b01001; // xor
+                          6'b100111: ALUCtl <= 5'b01000; // nor
 
-//                        2'd42: ALUCtl <= 5'b00111; // slt
+                          6'b101010: ALUCtl <= 5'b00111; // slt
 //                        // 2'd43: ALUCtl <= 5'b00111; // sltu 
 
 //                        2'd44: ALUCtl <= 5'b01100; // madd

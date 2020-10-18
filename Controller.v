@@ -57,7 +57,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 0'b000010; //  add Code
+        ALUOp <= 5'b000010; //  add Code
         end
         6'b001001: begin // addiu
         regDst <= 1;
@@ -67,7 +67,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // todo: Change to addu Code
+        ALUOp <= 5'b000010; // todo: Change to addu Code
         end
         6'b011100: begin // special2  madd/msub
         regDst <= 1;
@@ -82,12 +82,12 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         6'b100011: begin // lw
         regDst <= 0;
         ALUSource <= 1;
-        MemToReg <= 0;
+        MemToReg <= 1;
         regWrite <= 1;
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b101011: begin // sw
         ALUSource <= 1;
@@ -95,7 +95,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b100000: begin // lb
         regDst <= 0;
@@ -105,7 +105,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
-       ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b100001: begin //lh
         regDst <= 0;
@@ -115,7 +115,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b101000: begin // sb
         ALUSource <= 1;
@@ -123,7 +123,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b101001: begin // sh
         ALUSource <= 1;
@@ -131,7 +131,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b001111: begin // lui
         regDst <= 0;
@@ -141,7 +141,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; // add Code
+        ALUOp <= 5'b000010; // add Code
         end
         6'b000001: begin // bgez skipped for now
         ALUSource <= 0;

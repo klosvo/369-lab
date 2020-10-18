@@ -91,14 +91,15 @@ module Top( input Clk, Reset
     Mux5Bit2To1 RegDstMux (SelRd, EXrdReg, EXrsReg, EXregDst);
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);
     ALUControl ALUcontroller(EXALUOp, EXOffset, ALUcontrolWire); //EXALUOp, EXOffset, ALUcontrol
-    ALU32Bit ALU(ALUcontrolWire, EXReadData1, ALUInput, ALUResult, zeroFlag, Debug_HI, Debug_LO);
+    ALU32Bit ALU(ALUcontrolWire, EXReadData1, ALUInput, ALUResult, zeroFlag, Debug_LO, Debug_HI);
+    
     
     // EX/MEM
     EX_MEM_Reg ExMemReg(EXBranchAddress, ALUResult, EXReadData2, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg, zeroFlag, Clk,
                         BranchAddress, MemALUResult, MemReadData2, MemRd, MemregWrite, MemMemWrite, MemMemRead, MemBranchJump, MemMemToReg, MemZero);
                         
     // Memory Access Stage
-   DataMemory datamemory(MemALUResult, MemReadData2, Clk, MemMemWrite, MemMemRead, MemReadData);
+   DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, MemReadData);
    BranchAnd BAnd(MemBranchJump, MemZero, PCSrc);
    
    // MEM/WB
