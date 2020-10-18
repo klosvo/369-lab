@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/15/2020 08:51:30 PM
+// Create Date: 10/17/2020 12:20:23 PM
 // Design Name: 
-// Module Name: BranchAnd
+// Module Name: Top_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,19 +20,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module BranchAnd(Branch, Zero, PCSrc);
-    input [1:0] Branch;
-    input Zero;
+module Top_tb(
+
+    );
+    reg clk;
+    reg reset;
     
-    output reg PCSrc;
+    Top top(clk, reset);
+    integer i;
     
-    initial begin
-        PCSrc <= 0;
-    end
-    
-    always @ (*)begin
-        PCSrc =  Branch[0] & Zero;
-    end
+	
+	initial begin
+	reset = 0;
+        for (i = 0; i < 200; i = i+1) begin
+           #200 clk = 0;
+           #200 clk = 1;
+        end
+	end
+	
     
     
 endmodule

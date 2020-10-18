@@ -60,7 +60,7 @@ module InstructionMemory(Address, Instruction);
             memory[8] <= 32'b00000000000000000000000000000000;	//		nop
             memory[9] <= 32'b00000000000000000000000000000000;	//		nop
             memory[10] <= 32'b00000001000010010101000000100000;	//		add	$t2, $t0, $t1
-            memory[11] <= 32'b00000011111000000000000000001000;	//		jr	$ra
+            
         
         /*
             //  TASK 3
@@ -135,7 +135,6 @@ module InstructionMemory(Address, Instruction);
         end
         
         always @ (Address) begin
-        if (Address < 12)
             Instruction <= memory[Address[8:2]];    
         end
 
