@@ -12,49 +12,37 @@
 // B: 32-Bit input port B.
 //
 // OUTPUTS:-
-// ALUResult: 64-Bit ALU result output.
+// ALUResult: 32-Bit ALU result output.
 // ZERO: 1-Bit output flag. 
 //
 // FUNCTIONALITY:-
 // Design a 32-Bit ALU, so that it supports all arithmetic operations 
 // needed by the MIPS instructions given in Labs5-8.docx document. 
-// 
-// The 'ALUResult' will output the corresponding result of the operation 
-// based on the 32-Bit inputs, 'A', and 'B'. 
-// The 'Zero' flag is high when 'ALUResult' is '0'. 
-// The 'ALUControl' signal should determine the function of the ALU 
-// You need to determine the bitwidth of the ALUControl signal based on the number of 
-// operations needed to support. 
+//   The 'ALUResult' will output the corresponding result of the operation 
+//   based on the 32-Bit inputs, 'A', and 'B'. 
+//   The 'Zero' flag is high when 'ALUResult' is '0'. 
+//   The 'ALUControl' signal should determine the function of the ALU 
+//   You need to determine the bitwidth of the ALUControl signal based on the number of 
+//   operations needed to support. 
 //
 // Op|'ALUControl' value | Description | Notes
 // ==========================
-// AND, ANDI            			| 00000 | ALUResult = A and B
-// OR, ORI, SEB, SEH    			| 00001 | ALUResult = A or B
-// ADDITION, lw, sw, lb, sb, lh, sh     	| 00010 | ALUResult = A + B
-// LEFT SHIFT, SLL, SLLV	    		| 00011 | ALUResult = A << B
-// RIGHT SHIFT, SRL, SRLV, SRA, SRAV     	| 00100 | ALUResult = A >> B
-// MULTIPLICATION, MUL, MULT, MULTU 		| 00101 | ALUResult = A * B
-// SUBRACTION, BEQ, BNE       			| 00110 | ALUResult = A - B
-// SET LESS THAN, BLTZ, BGEZ, SLTIU, SLTU  	| 00111 | ALUResult =(A < B)? 1:0
-// NOR   					| 01000 | ALUResult = ~(A or B)
-// XOR, XORI					| 01001 | ALUResult = A xor B
-// ROTR, ROTRV					| 01010 | Rotate B Right
-// DIVIDE					| 01011 | ALUResult = A / B
-// MADD						| 01100 | ALUResult = ALUResult + A * B
-// MSUB						| 01101 | ALUResult = ALUResult - A * B
-// MOVZ						| 01110 | if (B == 0), ALUResult = A, else ALUResult = 0;
-// MOVN						| 01111 | if (B == 0), ALUResult = 0, else ALUResult = A;
-// MFHI						| 10000 | Move ALUResultHI into the lower 32 bits of ALUResult;
-// MTHI						| 10001 | Move A into the upper 32 bits of ALUResult;
-// MFLO						| 10010 | Move ALUResultLO into the lower 32 bits of ALUResult;
-// MTLO						| 10011 | Move A into the lower 32 bits of ALUResult;
-// LUI						| 10100 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
-// SEB						| 10101 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
-// SEH						| 10110 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
+// ADDITION       | 0000 | ALUResult = A + B
+// SUBRACTION     | 0001 | ALUResult = A - B
+// MULTIPLICATION | 0010 | ALUResult = A * B        (see notes below)
+// AND            | 0011 | ALUResult = A and B
+// OR             | 0100 | ALUResult = A or B
+// SET LESS THAN  | 0101 | ALUResult =(A < B)? 1:0  (see notes below)
+// SET EQUAL      | 0110 | ALUResult =(A=B)  ? 1:0
+// SET NOT EQUAL  | 0111 | ALUResult =(A!=B) ? 1:0
+// LEFT SHIFT     | 1000 | ALUResult = A << B       (see notes below)
+// RIGHT SHIFT    | 1001 | ALUResult = A >> B	    (see notes below)
+// COUNT ONES     | 1010 | ALUResult = A CLO        (see notes below)
+// COUNT ZEROS    | 1011 | ALUResult = A CLZ        (see notes below)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
+module ALU32Bit(ALUControl, A, B, ALUResult, Zero, Debug_HI, Debug_LO);
 
 	input [3:0] ALUControl; 	// Control bits for ALU operation
                                 // you need to adjust the bitwidth as needed
@@ -62,12 +50,19 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
     
 	output reg [31:0] ALUResult;	// 32 bit outputs
 	output reg Zero;	
-	(* mark_debug = "true" *) wire [31:0] Debug_HI, Debug_LO; 
+	output wire [31:0] Debug_HI, Debug_LO; 
 	
 	reg [63:0] MultResult;
 
 	reg [31:0] HIReg, LOReg;  
           		// Zero=1 if ALUResult == 0
+    assign Debug_HI = HIReg;
+    assign Debug_LO = ALUResult;
+    
+    initial begin
+        HIReg = 0;
+        LOReg = 0;
+    end
 
     always @ (ALUControl, A, B) begin
 		Zero <= 0;
@@ -80,16 +75,19 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 			// AND, ANDI
 			5'b00000: begin 
 					ALUResult <= A & B;	
+					
 				  end 
 
 			// OR, ORI, SEB, SEH???          
 			5'b00001: begin
-					ALUResult[31:0] <= A | B;	
+					ALUResult[31:0] <= A | B;
+						
 				  end 
 
 			// ADDITION, add, lw, sw, lb, sb, lh, sh         
 			5'b00010: begin 
-					ALUResult[31:0] <= A + B;	
+					ALUResult[31:0] <= A + B;
+					LOReg <= ALUResult;	
 				  end 
 
 			// LEFT SHIFT, SLL, SLLV	
@@ -175,7 +173,7 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 				  end 
 		endcase
 
-        LOReg <= ALUResult;
+        //LOReg <= ALUResult;
 		if (ALUResult == 0) begin
 			Zero <= 1;
 		end
@@ -183,8 +181,6 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 		
 	end
 	
-	assign Debug_LO = LOReg;
-	assign Debug_HI = HIReg;
 	
 endmodule
 

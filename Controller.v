@@ -24,7 +24,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
     input [5:0] instruction;
     output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite;
     output reg [1:0] BranchJump;
-    output reg [5:0] ALUOp;
+    output reg [4:0] ALUOp;
     
     initial begin
         regDst = 0;
@@ -47,7 +47,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
             MemRead = 1'b0;
             MemWrite = 1'b0;
             BranchJump = 2'b00;
-            ALUOp = 6'b000010;
+            ALUOp = 5'b000000;
             end
         6'b001000: begin // addi
         regDst <= 1;
@@ -57,7 +57,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b000010; //  add Code
+        ALUOp <= 0'b000010; //  add Code
         end
         6'b001001: begin // addiu
         regDst <= 1;
@@ -67,7 +67,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 6'b0000100; // todo: Change to addu Code
+        ALUOp <= 6'b000010; // todo: Change to addu Code
         end
         6'b011100: begin // special2  madd/msub
         regDst <= 1;
