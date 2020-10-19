@@ -23,7 +23,7 @@
 module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp);
     input [5:0] instruction;
     output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite;
-    output reg [1:0] BranchJump;
+    output reg [2:0] BranchJump;
     output reg [4:0] ALUOp;
     
     initial begin
@@ -46,7 +46,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
             regWrite = 1'b1;
             MemRead = 1'b0;
             MemWrite = 1'b0;
-            BranchJump = 2'b00;
+            BranchJump = 3'b000;
             ALUOp = 5'b000000;
             end
         6'b001000: begin // addi
@@ -148,7 +148,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b100;
         ALUOp <= 0; // todo: Change to sub Code
         end
         6'b000100: begin // beq
@@ -156,7 +156,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b001;
         ALUOp <= 2'b01; // sub Code
         end
         6'b000101: begin // bne
@@ -164,7 +164,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b010;
         ALUOp <= 2'b01; // sub Code
         end
         6'b000111: begin // bgtz
@@ -172,7 +172,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b101;
         ALUOp <= 0; // todo: Change to sub Code
         end
         6'b000110: begin // blez
@@ -180,15 +180,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
-        ALUOp <= 0; // todo: Change to sub Code
-        end
-        6'b000001: begin // bltz // Skipped for now
-        ALUSource <= 0;
-        regWrite <= 0;
-        MemRead <= 0;
-        MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b110;
         ALUOp <= 0; // todo: Change to sub Code
         end
         6'b000010: begin // j // reqires datapath modification
@@ -196,7 +188,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b011;
         ALUOp <= 0; // todo: Change to sub Code
         end
         6'b000011: begin // jal
@@ -204,7 +196,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
-        BranchJump <= 1;
+        BranchJump <= 3'b011;
         ALUOp <= 0; // todo: Change to sub Code
         end
         6'b001100: begin // andi

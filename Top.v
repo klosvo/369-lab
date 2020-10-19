@@ -33,22 +33,25 @@ module Top( input Clk, Reset
    wire [15:0] IDinstructionOffset;
    wire [5:0] InstructionIn, funct;
    wire [4:0] IDALUOp, IDrs, IDrt, IDrd;
-   wire [1:0] IDbranchJump;
+   wire [2:0] IDbranchJump;
    wire IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite;
    
    // Execute Stage wires
    wire [31:0] EXPCAddResult, EXReadData1, EXReadData2, EXOffset, ShiftedOffset, ALUInput, EXBranchAddress, ALUResult;
+   wire [5:0] EXfunct;
    wire [4:0] EXALUOp;
    wire [4:0] EXrsReg, EXrdReg, SelRd;
    wire [4:0] ALUcontrolWire;
+   wire [2:0] EXBranchOp;
    wire [1:0] EXbranchJump;
    wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag;
    
    //Memory Stage wires
-    wire [31:0]  BranchAddress, MemALUResult, MemReadData2, MemReadData;
+    wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData;
     wire [4:0] MemRd;
     wire [1:0] MemBranchJump;
-    wire MemregWrite, MemMemWrite, MemMemRead, MemMemToReg, MemZero, PCSrc;
+    wire MemregWrite, MemMemWrite, MemMemRead, MemMemToReg, MemZero;
+    wire [1:0] PCSrc;
   
   //WB stage wires
   wire [31:0]  MemoryOut, ALUOut, RegWriteData;
@@ -69,7 +72,7 @@ module Top( input Clk, Reset
     Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
 	ProgramCounter counter(Address, PCResult, Reset, Clk, Debug_Program_Counter);
 	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
-	Mux32Bit2To1 PCSrcMux(Address, PCAddResult, BranchAddress, PCSrc); // hook up branch Control
+	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemReadData1, 0, PCSrc); // hook up branch Control
 	
 	// IF/ID
 	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, Clk, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
@@ -79,11 +82,13 @@ module Top( input Clk, Reset
 	RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, Clk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
 	SignExtension signExtend(IDinstructionOffset, IDSignExtendedOffset);
 	
+	
+	
 	// ID/EX
 	ID_EX_Reg IdExReg(IDRegPCAddResult, ReadData1, ReadData2, IDSignExtendedOffset, IDrt, IDrd,
-	                   IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp,Clk,
+	                   IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp,Clk,
 	                   EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
-	                   EXMemRead, EXMemWrite, EXbranchJump, EXALUOp);
+	                   EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp);
 	                   
 	// Execution Stage
     Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
@@ -92,15 +97,16 @@ module Top( input Clk, Reset
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);
     ALUControl ALUcontroller(EXALUOp, EXOffset, ALUcontrolWire); //EXALUOp, EXOffset, ALUcontrol
     ALU32Bit ALU(ALUcontrolWire, EXReadData1, ALUInput, ALUResult, zeroFlag, Debug_LO, Debug_HI);
+    BranchControlModule BranchAndJumpController(EXBranchOp, EXReadData1, EXReadData2, EXrsReg, EXbranchJump, EXfunct);
     
     
     // EX/MEM
-    EX_MEM_Reg ExMemReg(EXBranchAddress, ALUResult, EXReadData2, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg, zeroFlag, Clk,
-                        BranchAddress, MemALUResult, MemReadData2, MemRd, MemregWrite, MemMemWrite, MemMemRead, MemBranchJump, MemMemToReg, MemZero);
+    EX_MEM_Reg ExMemReg(EXBranchAddress, ALUResult, EXReadData2, EXReadData1, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg, zeroFlag, Clk,
+                        BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, MemMemToReg, MemZero);
                         
     // Memory Access Stage
    DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, MemReadData);
-   BranchAnd BAnd(MemBranchJump, MemZero, PCSrc);
+   //BranchAnd BAnd(MemBranchJump, MemZero, PCSrc);
    
    // MEM/WB
    MEM_WB_Reg MemWbReg(MemReadData, MemALUResult, MemRd, MemMemToReg, MemregWrite, Clk,
