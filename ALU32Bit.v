@@ -192,6 +192,11 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[15:0] <= B[15:0];
 					ALUResult[63:16] <= 48'b0;
 				  end 
+			
+			//NOP	  
+			5'b11111: begin						
+					ALUResult <= 64'b0;
+				  end 
 		endcase
 	end
 endmodule

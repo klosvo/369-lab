@@ -4,21 +4,36 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALUControl(ALUOp, funct, ALUCtl);
+module ALUControl(ALUOp, op, funct, ALUCtl);
 
     input [1:0] ALUOp;  // Control bits for ALU operation
-    input [5:0] funct;
+    input [5:0] op, funct;
     output reg [4:0] ALUCtl;
 
-    always @ (ALUOp, funct)
+    always @ (ALUOp, op, funct)
         case (ALUOp)
             2'b00:  // lw, sw, lb, sb, lh, sh
                 begin
                     ALUCtl <= 5'b00010;  // add
                 end  
-            2'b01:  // beq
+            2'b01:  // I-TYPE, beq
                 begin
-                    ALUCtl <= 5'b00100;   // subtract 
+                    case(op)
+                        6'b001000: ALUCtl <= 5'b00010; // addi  2    (32)
+                        6'b001001: ALUCtl <= 5'b00010; // addiu 2    (32)
+                        6'b001100: ALUCtl <= 5'b00000; // andi 0    (36)
+                        6'b001101: ALUCtl <= 5'b00001; // ori  1     (37)
+                        6'b001110: ALUCtl <= 5'b01101; // xori 13   (38)
+                        6'b001111: ALUCtl <= 5'b11001; // lui  25 (4)
+                        6'b001010: ALUCtl <= 5'b01010; // slti 10    (42)
+                        6'b001011: ALUCtl <= 5'b01011; // sltiu 11   (43)
+                        
+                        6'b000100: ALUCtl <= 5'b00100;   // beq = subtract
+                        6'b000001: ALUCtl <= 5'b00100;   // bgez, bltz = subtract 
+                        6'b000111: ALUCtl <= 5'b00100;   // bgtz = subtract 
+                        6'b000110: ALUCtl <= 5'b00100;   // blez = subtract 
+                        6'b000101: ALUCtl <= 5'b00100;   // bne = subtract 
+                    endcase
                 end                                     
             2'b10: // R-type
                 begin
@@ -26,12 +41,14 @@ module ALUControl(ALUOp, funct, ALUCtl);
                         6'b000000: ALUCtl <= 5'b00110; // sll  6 (0)
                         6'b000010: ALUCtl <= 5'b00111; // srl  7 (2) 
                         6'b000011: ALUCtl <= 5'b00111; // sra  7 (3)
-                        6'b000100: ALUCtl <= 5'b11001; // lui  25 (4)
+                        
                         6'b000101: ALUCtl <= 5'b11010; // seb  26 (5)
                         6'b000110: ALUCtl <= 5'b11011; // seh  27    (6)
                         
                         6'b000111: ALUCtl <= 5'b01110; // rotr, rotrv  14   (7)
                         // 2'd08: ALUCtl <= 5'b10110; // rotrv
+
+                      //  6'b001000: ALUCtl <= 5'b01110; // jr
 
                         6'b001010: ALUCtl <= 5'b10011; // movz  19   (10)
                         6'b001011: ALUCtl <= 5'b10100; // movn  20   (11)
@@ -45,14 +62,14 @@ module ALUControl(ALUOp, funct, ALUCtl);
                         6'b011010: ALUCtl <= 5'b01111; // div    15  (26)
                         6'b011011: ALUCtl <= 5'b10000; // divu   16  (27)
                         
-                        6'b100000: ALUCtl <= 5'b00010; // add/addi  2    (32)
-                        6'b100001: ALUCtl <= 5'b00011; // addu/addiu  3 (33)
+                        6'b100000: ALUCtl <= 5'b00010; // add   2    (32)
+                        6'b100001: ALUCtl <= 5'b00011; // addu  3 (33)
                         6'b100010: ALUCtl <= 5'b00100; // sub 4     (34)
                         6'b100011: ALUCtl <= 5'b00101; // subu 5    (35)
 
-                        6'b100100: ALUCtl <= 5'b00000; // and/andi 0    (36)
-                        6'b100101: ALUCtl <= 5'b00001; // or/ori  1     (37)
-                        6'b100110: ALUCtl <= 5'b01101; // xor/xori 13   (38)
+                        6'b100100: ALUCtl <= 5'b00000; // and 0    (36)
+                        6'b100101: ALUCtl <= 5'b00001; // or  1     (37)
+                        6'b100110: ALUCtl <= 5'b01101; // xor 13   (38)
                         6'b100111: ALUCtl <= 5'b01100; // nor 12    (39)
 
                         6'b101010: ALUCtl <= 5'b01010; // slt 10    (42)
@@ -64,3 +81,4 @@ module ALUControl(ALUOp, funct, ALUCtl);
             default: ALUCtl <= 6'b111111; // do nothing?//should not happen  31
         endcase
 endmodule
+
