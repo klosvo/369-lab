@@ -64,7 +64,7 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 	input [4:0] ALUControl; 	// Control bits for ALU operation
 	input [31:0] A, B;	    	// Inputs
 
-	output reg [63:0] ALUResult = 64'b0;	// 64 bit output
+	output reg [63:0] ALUResult = 64'h0000000000000000;	// 64 bit output
 	output Zero;	    		// Zero=1 if ALUResult == 0
     assign Zero = (ALUResult == 64'h0000000000000000) ? 1 : 0; 
     
