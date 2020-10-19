@@ -46,7 +46,9 @@ module HiLoRegs( HI_input, LO_input, regWrite, HI_output, LO_output
         end
         end
     always @ (HI_input) begin
+        if (regWrite == 1) begin
         HIReg = HI_input;
+        end
     end
     
 endmodule

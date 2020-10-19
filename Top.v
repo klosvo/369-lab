@@ -39,12 +39,12 @@ module Top( input Clk, Reset
    // Execute Stage wires
    wire [31:0] EXPCAddResult, EXReadData1, EXReadData2, EXOffset, ShiftedOffset, ALUInput, EXBranchAddress, ALUResult;
    wire [5:0] EXfunct;
-   wire [4:0] EXALUOp;
+   wire [4:0] EXALUOp, SEH;
    wire [4:0] EXrsReg, EXrdReg, SelRd;
    wire [4:0] ALUcontrolWire;
    wire [2:0] EXBranchOp;
    wire [1:0] EXbranchJump;
-   wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag;
+   wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag, HiLoWrite;
    
    //Memory Stage wires
     wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData;
@@ -90,13 +90,15 @@ module Top( input Clk, Reset
 	                   EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
 	                   EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp);
 	                   
+	                   assign SEH = EXOffset[10:6];
+	                   
 	// Execution Stage
     Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
     Mux32Bit2To1 ALUsrcMux (ALUInput, EXReadData2, EXOffset, EXALUSource);
     Mux5Bit2To1 RegDstMux (SelRd, EXrdReg, EXrsReg, EXregDst);
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);
-    ALUControl ALUcontroller(EXALUOp, EXOffset, ALUcontrolWire); //EXALUOp, EXOffset, ALUcontrol
-    ALU32Bit ALU(ALUcontrolWire, EXReadData1, ALUInput, ALUResult, zeroFlag, Debug_LO, Debug_HI);
+    ALUControl ALUcontroller(EXALUOp, EXfunct, SEH, ALUcontrolWire, HiLoWrite); //EXALUOp, EXOffset, ALUcontrol
+    ALU32Bit ALU(ALUcontrolWire, EXReadData1, ALUInput, HiLoWrite, SEH, ALUResult, zeroFlag, Debug_HI, Debug_LO);
     BranchControlModule BranchAndJumpController(EXBranchOp, EXReadData1, EXReadData2, EXrsReg, EXbranchJump, EXfunct);
     
     
