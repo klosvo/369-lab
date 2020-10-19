@@ -96,12 +96,14 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
                 ALUResult = $unsigned(A) + $unsigned(B);
             end
 			// LEFT SHIFT, SLL	
-			5'b00011: ALUResult <= (A << LogicalOffset);
-			5'b11101: ALUResult <= A << B;	   
+			5'b00011: begin
+			     ALUResult = B << LogicalOffset;
+			end
+			5'b11101: ALUResult <= B << A;	   
 
 			// RIGHT SHIFT, SRL, SRLV, SRA, SRAV		 
-			5'b00100: ALUResult <= A >> LogicalOffset; 
-			5'b11110: ALUResult <= A >> B;        		
+			5'b00100: ALUResult <= B >> LogicalOffset; 
+			5'b11110: ALUResult <= B >> A;        		
 
 			// MULTIPLICATION -> MUL, MULT, MULTU		
 			5'b00101: begin // mult
@@ -193,19 +195,18 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			5'b10100: begin						
 					ALUResult[31:16] <= B[15:0];
 					ALUResult[15:0] <= 16'b0;
-					ALUResult[63:32] <= 16'b0;
 				  end 
 
 			// SEB -> which is faster, concatenating or assigning?         
 			5'b10101: begin						
 					ALUResult[7:0] <= B[7:0];
-					ALUResult[63:8] <= 56'b0;
+					ALUResult[31:8] <= 56'b0;
 				  end 
 
 			// SEH                 
 			5'b10110: begin						
 					ALUResult[15:0] <= B[15:0];
-					ALUResult[63:16] <= 48'b0;
+					ALUResult[31:16] <= 48'b0;
 				  end 
 		endcase
 

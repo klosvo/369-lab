@@ -90,9 +90,9 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         ALUOp <= 5'b01000; // 
         end
         6'b100011: begin // lw
-        regDst <= 0;
+        regDst <= 1;
         ALUSource <= 1;
-        MemToReg <= 1;
+        MemToReg <= 0;
         regWrite <= 1;
         MemRead <= 1;
         MemWrite <= 0;

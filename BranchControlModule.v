@@ -66,12 +66,12 @@ module BranchControlModule(Op, A, B, BGE_BLT, BranchAndJump, funct
         end
         
         3'b011: begin // j
-                BranchAndJump = 2'b01;
+                BranchAndJump = 2'b10;
         end
         
         3'b000: begin //jr
             if (funct == 6'b001000) begin
-            BranchAndJump = 2'b10;
+            BranchAndJump = 2'b11;
             end
             else BranchAndJump = 0;
         end

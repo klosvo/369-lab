@@ -47,7 +47,7 @@ module Top( input Clk, Reset
    wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag, HiLoWrite;
    
    //Memory Stage wires
-    wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData;
+    wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData, MemOffset;
     wire [4:0] MemRd;
     wire [1:0] MemBranchJump;
     wire MemregWrite, MemMemWrite, MemMemRead, MemMemToReg, MemZero;
@@ -72,7 +72,7 @@ module Top( input Clk, Reset
     Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
 	ProgramCounter counter(Address, PCResult, Reset, Clk, Debug_Program_Counter);
 	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
-	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemReadData1, 0, PCSrc); // hook up branch Control
+	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
 	
 	// IF/ID
 	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, Clk, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
@@ -103,8 +103,8 @@ module Top( input Clk, Reset
     
     
     // EX/MEM
-    EX_MEM_Reg ExMemReg(EXBranchAddress, ALUResult, EXReadData2, EXReadData1, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg, zeroFlag, Clk,
-                        BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, MemMemToReg, MemZero);
+    EX_MEM_Reg ExMemReg(EXBranchAddress, ALUResult, EXReadData2, EXReadData1, EXOffset, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg, zeroFlag, Clk,
+                        BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemOffset, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, MemMemToReg, MemZero);
                         
     // Memory Access Stage
    DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, MemReadData);

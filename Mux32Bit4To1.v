@@ -29,16 +29,12 @@ module Mux32Bit4To1(out, inA, inB, inC, inD, sel);
 
     /* Fill in the implementation here ... */ 
     always @ (inA, inB, sel) begin
-       if (sel == 3) begin
-            out <= inD;
-       end
-       else if (sel == 2) begin
-            out <= inC;
-       end
-       else if (sel == 1)
-            out <= inB;    
-       else
-            out <= inA;
+        case (sel)
+            2'b00: out <= inA;
+            2'b01: out <= inB;
+            2'b10: out <= inC;
+            2'b11: out <= inD;
+            default: out <= inA;
+        endcase
     end
-
 endmodule
