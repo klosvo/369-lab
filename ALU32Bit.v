@@ -1,6 +1,5 @@
 `timescale 1ns / 1ps
 
-INCOMPLETE
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
@@ -29,29 +28,34 @@ INCOMPLETE
 //
 // Op|'ALUControl' value | Description | Notes
 // ==========================
-// AND, ANDI            			| 00000 | ALUResult = A and B
-// OR, ORI, SEB, SEH    			| 00001 | ALUResult = A or B
-// ADDITION, lw, sw, lb, sb, lh, sh     	| 00010 | ALUResult = A + B
-// LEFT SHIFT, SLL, SLLV	    		| 00011 | ALUResult = A << B
-// RIGHT SHIFT, SRL, SRLV, SRA, SRAV     	| 00100 | ALUResult = A >> B
-// MULTIPLICATION, MUL, MULT, MULTU 		| 00101 | ALUResult = A * B
-// SUBRACTION, BEQ, BNE       			| 00110 | ALUResult = A - B
-// SET LESS THAN, BLTZ, BGEZ, SLTIU, SLTU  	| 00111 | ALUResult =(A < B)? 1:0
-// NOR   					| 01000 | ALUResult = ~(A or B)
-// XOR, XORI					| 01001 | ALUResult = A xor B
-// ROTR, ROTRV					| 01010 | Rotate B Right
-// DIVIDE					| 01011 | ALUResult = A / B
-// MADD						| 01100 | ALUResult = ALUResult + A * B
-// MSUB						| 01101 | ALUResult = ALUResult - A * B
-// MOVZ						| 01110 | if (B == 0), ALUResult = A, else ALUResult = 0;
-// MOVN						| 01111 | if (B == 0), ALUResult = 0, else ALUResult = A;
-// MFHI						| 10000 | Move ALUResultHI into the lower 32 bits of ALUResult;
-// MTHI						| 10001 | Move A into the upper 32 bits of ALUResult;
-// MFLO						| 10010 | Move ALUResultLO into the lower 32 bits of ALUResult;
-// MTLO						| 10011 | Move A into the lower 32 bits of ALUResult;
-// LUI						| 10100 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
-// SEB						| 10101 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
-// SEH						| 10110 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
+// AND, ANDI            			     | 00000 | ALUResult = A and B
+// OR, ORI, SEB, SEH    			     | 00001 | ALUResult = A or B
+// ADDITION, lw, sw, lb, sb, lh, sh      | 00010 | ALUResult = A + B
+// ADDITION, ADDU, ADDUI                 | 00011 | ALUResult = A + B
+// SUBRACTION, BEQ, BNE       			 | 00100 | ALUResult = A - B
+// SUBRACTION, SUBU       			     | 00101 | ALUResult = A - B
+// LEFT SHIFT, SLL, SLLV	    		 | 00110 | ALUResult = A << B
+// RIGHT SHIFT, SRL, SRLV, SRA, SRAV     | 00111 | ALUResult = A >> B
+// MULTIPLICATION, MUL, MULT 		     | 01000 | ALUResult = A * B
+// MULTIPLICATION, MULTU 		         | 01001 | ALUResult = A * B
+// SET LESS THAN, BLTZ, BGEZ  	         | 01010 | ALUResult =(A < B)? 1:0
+// SET LESS THAN, SLTIU, SLTU  	         | 01011 | ALUResult =(A < B)? 1:0
+// NOR   					             | 01100 | ALUResult = ~(A or B)
+// XOR, XORI					         | 01101 | ALUResult = A xor B
+// ROTR, ROTRV					         | 01110 | Rotate B Right
+// DIVIDE					             | 01111 | ALUResult = A / B
+// DIVIDE, DIVU					         | 10000 | ALUResult = A / B
+// MADD						             | 10001 | ALUResult = ALUResult + A * B
+// MSUB						             | 10010 | ALUResult = ALUResult - A * B
+// MOVZ						             | 10011 | if (B == 0), ALUResult = A, else ALUResult = 0;
+// MOVN						             | 10100 | if (B == 0), ALUResult = 0, else ALUResult = A;
+// MFHI						             | 10101 | Move ALUResultHI into the lower 32 bits of ALUResult;
+// MTHI						             | 10110 | Move A into the upper 32 bits of ALUResult;
+// MFLO						             | 10111 | Move ALUResultLO into the lower 32 bits of ALUResult;
+// MTLO						             | 11000 | Move A into the lower 32 bits of ALUResult;
+// LUI						             | 11001 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
+// SEB						             | 11010 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
+// SEH						             | 11011 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -60,22 +64,19 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 	input [4:0] ALUControl; 	// Control bits for ALU operation
 	input [31:0] A, B;	    	// Inputs
 
-	output [63:0] reg ALUResult;	// 64 bit output
+	output reg [63:0] ALUResult = 64'b0;	// 64 bit output
 	output Zero;	    		// Zero=1 if ALUResult == 0
-
-	always @* begin
-		Zero <= 0;
-		ALUResult = 32'h0; // ALUResult <= 32'h0;
-
+    assign Zero = (ALUResult == 64'h0000000000000000) ? 1 : 0; 
+    
+	always @(A, B, ALUControl) begin
 		case(ALUControl)
-
 			// AND, ANDI
 			5'b00000: begin 
 					ALUResult[31:0] <= A & B;	
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// OR, ORI, SEB, SEH???          
+			// OR, ORI          
 			5'b00001: begin
 					ALUResult[31:0] <= A | B;	
 					ALUResult[63:32] <= 0;
@@ -83,24 +84,24 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 
 			// ADDITION, add, addi, lw, sw, lb, sb, lh, sh         
 			5'b00010: begin 
-					ALUResult[31:0] <= A + B;	
-					ALUResult[63:32] <= 0;
+					ALUResult <= $signed(A) + $signed(B);	
+					//ALUResult[63:32] <= 0;
 				  end 
 
 			// ADDITION, addu, addui   
 			5'b00011: begin 
-					ALUResult[31:0] <= signed'(A) + signed'(B);	
+					ALUResult[31:0] <= $unsigned(A) + $unsigned(B);	
 					ALUResult[63:32] <= 0;
 				  end 
 
 			// SUBTRACTION, SUB, BEQ, BNE          
 			5'b00100: begin  
-					ALUResult[31:0] <= A - B;	 
+					ALUResult[31:0] <= $signed(A-B);	 
 					ALUResult[63:32] <= 0;
 				  end 
 			// SUBTRACTION, SUBU       
 			5'b00101: begin  
-					ALUResult[31:0] <= signed'(A) - signed'(B);	 
+					ALUResult[31:0] <= $unsigned(A - B);	 
 					ALUResult[63:32] <= 0;
 				  end
 
@@ -111,18 +112,16 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 			5'b00111: ALUResult <= A >> B;         		
 
 			// MULTIPLICATION -> MUL, MULT	
-			5'b01000: ALUResult <= A * B;	
+			5'b01000: ALUResult <= $signed(A) * $signed(B);	
 
 			// MULTIPLICATION -> MULTU
-			5'b01001: ALUResult <= signed'(A) * signed'(B);	
+			5'b01001: ALUResult <= $unsigned(A) * $unsigned(B);	
 
-			 
-
-			// SET LESS THAN, BLTZ, BGEZ 
-			5'b01010: ALUResult <= (A < B) ? 1'd1 : 64'b0; // check to make sure this is right
+			// SET LESS THAN, BLTZ, BGEZ  
+			5'b01010: ALUResult <= ($signed(A) < $signed(B)) ? 1'd1 : 64'b0;
 
 			// SET LESS THAN, SLTIU, SLTU
-			5'b01011: ALUResult <= (signed'(A) < signed'(B)) ? 1'd1 : 64'b0; // check to make sure this is right
+			5'b01011: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1'd1 : 64'b0; 
 
 			// NOR 		 
 			5'b01100: begin
@@ -136,35 +135,35 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[63:32] <= 0;
 				  end 
 
-			// ROTR, ROTRV         
-			5'b01110: ALUResult <= {32'b0, {B[A-1:0] | B[31:A]}}; // need to check   
+			// ROTR, ROTRV      
+			5'b01110: ALUResult <= {32'b0, {(B >> A) | (B << (32 - A))}};
 
 			// DIVIDE, DIV                           
-			5'b01111: begin						
-					ALUResult[31:0] <= A / B;	// quotient
-					ALUResult[63:32] <= A % B;	// remainder
+			5'b01111: begin					
+					ALUResult[31:0] <= $signed(A) / $signed(B);	// quotient
+					ALUResult[63:32] <= $signed(A) % $signed(B);	// remainder
 				  end 
 			
 			// DIVIDE, DIVU                 
-			5'b10000: begin						
-					ALUResult[31:0] <= signed'(A) / signed'(B);	// quotient
-					ALUResult[63:32] <= A % B;	// remainder
+			5'b10000: begin					
+					ALUResult[31:0] <= $unsigned(A) / $unsigned(B);	// quotient
+					ALUResult[63:32] <= $unsigned(A) % $unsigned(B);	// remainder
 				  end 
 			
 			// MADD         
-			5'b10001: ALUResult <= ALUResult + A * B; 
+			5'b10001: ALUResult <=  $signed(ALUResult) + $signed(A) * $signed(B); 
 
 			// MSUB         
-			5'b10010: ALUResult <= ALUResult - A * B;
+			5'b10010: ALUResult <= $signed(ALUResult) - $signed(A) * $signed(B);
 
 			// MOVZ         
-			5'b10011: ALUResult <= (B == 32'b0) ? A : 64'b0; // Need to double check that this performs as expected
+			5'b10011: ALUResult <= (B == 32'b0) ? A : 64'b0;
 
 			// MOVN         
-			5'b10100: ALUResult <= (B == 32'b0) ? 64'b0 : A; // Need to double check that this performs as expected
+			5'b10100: ALUResult <= (B == 32'b0) ? 64'b0 : A;
 
 			// MFHI           
-			5'b10101: ALUResult <= {32'b0, ALUResult[63:32]};
+			5'b10101: ALUResult <= {32'b0, ALUResult[63:32]};    //does this need to have an input HI? or is it supposed to be the hi of ALUResult
 
 			// MTHI              
 			5'b10110: ALUResult[63:32] <= A;
@@ -194,10 +193,5 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult[63:16] <= 48'b0;
 				  end 
 		endcase
-
-		if (ALUResult == 0) begin
-			Zero <= 1;
-		end 
 	end
-
 endmodule
