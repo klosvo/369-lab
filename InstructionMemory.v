@@ -48,21 +48,20 @@ module InstructionMemory(Address, Instruction);
          reg [31:0] memory [0:127];
     
          initial begin                   //need to initalize this for the code!!!
-<<<<<<< Updated upstream
-            
-            for(i=0; i<128; i=i+1) begin
-                memory[i] <= i*3;     
-            end
-=======
          
          
 memory[0] <= 32'b00000000000000000000000000000000;	//	main:	nop
 memory[1] <= 32'b00100000000010000000000001100100;	//	loop:	addi	$t0, $zero, 100
 memory[2] <= 32'b00100000000010010000000000000110;	//		addi	$t1, $zero, 6
 memory[3] <= 32'b00100000000010100000000000001010;	//		addi	$t2, $zero, 10
-memory[4] <= 32'b00000001000010010101100000100000;	//		add	$t3, $t0, $t1
-memory[5] <= 32'b00000001011010100110100000100010;	//		sub	$t5, $t3, $t2
-
+memory[4] <= 32'b10101101000010010000000000000000;	//		sw	$t1, 0($t0)
+memory[5] <= 32'b10101101000010100000000000000100;	//		sw	$t2, 4($t0)
+memory[6] <= 32'b10001101000100000000000000000000;	//		lw	$s0, 0($t0)
+memory[7] <= 32'b10001101000100010000000000000100;	//		lw	$s1, 4($t0)
+memory[8] <= 32'b00000010001100000101100000100010;	//		sub	$t3, $s1, $s0
+memory[9] <= 32'b00000000000010010110000011000000;	//		sll	$t4, $t1, 3
+memory[10] <= 32'b00000000000010010110100010000010;	//		srl	$t5, $t1, 2
+memory[11] <= 32'b00001000000000000000000000000001;	//		j	loop
 
 
 
@@ -97,7 +96,6 @@ memory[5] <= 32'b00000001011010100110100000100010;	//		sub	$t5, $t3, $t2
         
         
                 
->>>>>>> Stashed changes
         
         /*
             //  TASK 3
@@ -171,7 +169,7 @@ memory[5] <= 32'b00000001011010100110100000100010;	//		sub	$t5, $t3, $t2
 //           memory[12] = 32'h2008001d;	//	label2:	addi	$t0, $zero, 29
         end
         
-        always @ * begin
+        always @ (Address) begin
             Instruction <= memory[Address[8:2]];    
         end
 

@@ -50,8 +50,8 @@
 
 module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2, debug_reg16);
 
-	input [25:21] ReadRegister1;
-	input [20:16] ReadRegister2;
+	input [4:0] ReadRegister1;
+	input [4:0] ReadRegister2;
 	input [4:0] WriteRegister;
 	output reg [31:0] ReadData1, ReadData2;
 	input [31:0] WriteData;
@@ -75,13 +75,8 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
    end
 
    // Write procedure
-<<<<<<< Updated upstream
-   always @(posedge Clk) begin
-      if (RegWrite == 1)
-=======
    always @(posedge Clk, WriteData) begin
       if (RegWrite == 1 & ~(WriteRegister == 0))
->>>>>>> Stashed changes
          RegFile[WriteRegister] <= WriteData;
    end
    
