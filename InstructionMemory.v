@@ -48,10 +48,56 @@ module InstructionMemory(Address, Instruction);
          reg [31:0] memory [0:127];
     
          initial begin                   //need to initalize this for the code!!!
+<<<<<<< Updated upstream
             
             for(i=0; i<128; i=i+1) begin
                 memory[i] <= i*3;     
             end
+=======
+         
+         
+memory[0] <= 32'b00000000000000000000000000000000;	//	main:	nop
+memory[1] <= 32'b00100000000010000000000001100100;	//	loop:	addi	$t0, $zero, 100
+memory[2] <= 32'b00100000000010010000000000000110;	//		addi	$t1, $zero, 6
+memory[3] <= 32'b00100000000010100000000000001010;	//		addi	$t2, $zero, 10
+memory[4] <= 32'b00000001000010010101100000100000;	//		add	$t3, $t0, $t1
+memory[5] <= 32'b00000001011010100110100000100010;	//		sub	$t5, $t3, $t2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+        
+    
+
+        
+        
+                
+>>>>>>> Stashed changes
         
         /*
             //  TASK 3

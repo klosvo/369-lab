@@ -75,8 +75,13 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
    end
 
    // Write procedure
+<<<<<<< Updated upstream
    always @(posedge Clk) begin
       if (RegWrite == 1)
+=======
+   always @(posedge Clk, WriteData) begin
+      if (RegWrite == 1 & ~(WriteRegister == 0))
+>>>>>>> Stashed changes
          RegFile[WriteRegister] <= WriteData;
    end
    
