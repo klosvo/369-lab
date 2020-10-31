@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/15/2020 07:36:15 PM
+// Create Date: 10/17/2020 12:20:23 PM
 // Design Name: 
-// Module Name: Mux5Bit2To1
+// Module Name: Top_tb
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,19 +20,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Mux5Bit2To1(out, inA, inB, sel);
+module Top_tb(
 
-    output reg [4:0] out;
+    );
+    reg clk;
+    reg reset;
     
-    input [4:0] inA;
-    input [4:0] inB;
-    input sel;
-
-    /* Fill in the implementation here ... */ 
-    always @ (inA, inB, sel) begin
-       if (sel == 1)
-            out <= inB;    
-       else
-            out <= inA;
-    end
+    Top top(clk, reset);
+    integer i;
+    
+	
+	initial begin
+	reset = 0;
+        for (i = 0; i < 128; i = i+1) begin
+           #100 clk = 0;
+           #100 clk = 1;
+        end
+	end
+	
+    
+    
 endmodule

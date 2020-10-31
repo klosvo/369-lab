@@ -12,19 +12,18 @@
 // B: 32-Bit input port B.
 //
 // OUTPUTS:-
-// ALUResult: 64-Bit ALU result output.
+// ALUResult: 32-Bit ALU result output.
 // ZERO: 1-Bit output flag. 
 //
 // FUNCTIONALITY:-
 // Design a 32-Bit ALU, so that it supports all arithmetic operations 
 // needed by the MIPS instructions given in Labs5-8.docx document. 
-// 
-// The 'ALUResult' will output the corresponding result of the operation 
-// based on the 32-Bit inputs, 'A', and 'B'. 
-// The 'Zero' flag is high when 'ALUResult' is '0'. 
-// The 'ALUControl' signal should determine the function of the ALU 
-// You need to determine the bitwidth of the ALUControl signal based on the number of 
-// operations needed to support. 
+//   The 'ALUResult' will output the corresponding result of the operation 
+//   based on the 32-Bit inputs, 'A', and 'B'. 
+//   The 'Zero' flag is high when 'ALUResult' is '0'. 
+//   The 'ALUControl' signal should determine the function of the ALU 
+//   You need to determine the bitwidth of the ALUControl signal based on the number of 
+//   operations needed to support. 
 //
 // Op|'ALUControl' value | Description | Notes
 // ==========================
@@ -56,141 +55,178 @@
 // LUI						             | 11001 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
 // SEB						             | 11010 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
 // SEH						             | 11011 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
+
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
+module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_Output, LO_Output);
 
 	input [4:0] ALUControl; 	// Control bits for ALU operation
-	input [31:0] A, B;	    	// Inputs
 
-	output reg [63:0] ALUResult = 64'h0000000000000000;	// 64 bit output
-	output Zero;	    		// Zero=1 if ALUResult == 0
-    assign Zero = (ALUResult == 64'h0000000000000000) ? 1 : 0; 
+    input [4:0] LogicalOffset;                            // you need to adjust the bitwidth as needed
+	input [31:0] A, B;	 
+	input regWrite;   	// Inputs
+	
     
-	always @(A, B, ALUControl) begin
+	output reg [31:0] ALUResult;	// 32 bit outputs
+	output reg Zero;	
+	
+	reg [31:0] RegOutput;
+	
+	reg [63:0] MultResult;
+	
+	
+	reg [31:0] HI_Input, LO_Input;
+	output wire [31:0] HI_Output, LO_Output;
+	
+	HiLoRegs hilo(HI_Input, LO_Input, regWrite, HI_Output, LO_Output);
+	
+    initial begin
+        MultResult = 0;
+    end
+
+    always @ (ALUControl, A, B) begin
+		Zero <= 0;
+		HI_Input <= HI_Output;
+		LO_Input <= LO_Output;
+
+
 		case(ALUControl)
 			// AND, ANDI
 			5'b00000: begin 
-					ALUResult[31:0] <= A & B;	
-					ALUResult[63:32] <= 0;
+					ALUResult <= A & B;	
+					
 				  end 
 
 			// OR, ORI          
 			5'b00001: begin
-					ALUResult[31:0] <= A | B;	
-					ALUResult[63:32] <= 0;
+					ALUResult[31:0] <= A | B;
+						
 				  end 
 
-			// ADDITION, add, addi, lw, sw, lb, sb, lh, sh         
+			// ADDITION, add, lw, sw, lb, sb, lh, sh         
 			5'b00010: begin 
-					ALUResult <= $signed(A) + $signed(B);	
-					//ALUResult[63:32] <= 0;
+			        ALUResult = $signed(A) + $signed(B);
 				  end 
-
-			// ADDITION, addu, addui   
-			5'b00011: begin 
-					ALUResult[31:0] <= $unsigned(A) + $unsigned(B);	
-					ALUResult[63:32] <= 0;
-				  end 
-
-			// SUBTRACTION, SUB, BEQ, BNE          
-			5'b00100: begin  
-					ALUResult[31:0] <= $signed(A-B);	 
-					ALUResult[63:32] <= 0;
-				  end 
-			// SUBTRACTION, SUBU       
-			5'b00101: begin  
-					ALUResult[31:0] <= $unsigned(A - B);	 
-					ALUResult[63:32] <= 0;
-				  end
-
-			// LEFT SHIFT, SLL, SLLV	
-			5'b00110: ALUResult <= A << B;  		   
+				  
+		    // addu
+            5'b10111: begin
+                ALUResult = $unsigned(A) + $unsigned(B);
+            end
+			// LEFT SHIFT, SLL	
+			5'b00011: begin
+			     ALUResult = B << LogicalOffset;
+			end
+			5'b11101: ALUResult <= B << A;	   
 
 			// RIGHT SHIFT, SRL, SRLV, SRA, SRAV		 
-			5'b00111: ALUResult <= A >> B;         		
+			5'b00100: ALUResult <= B >> LogicalOffset; 
+			5'b11110: ALUResult <= B >> A;        		
 
-			// MULTIPLICATION -> MUL, MULT	
-			5'b01000: ALUResult <= $signed(A) * $signed(B);	
+			// MULTIPLICATION -> MUL, MULT, MULTU		
+			5'b00101: begin // mult
+			 MultResult <= $signed(A) * $signed(B);
+			 #5;
+			 HI_Input <= MultResult[63:32];
+			 LO_Input <= MultResult[31:0];
+            end
+            5'b11000: begin // mul
+                MultResult <= A * B;
+                #5;
+                ALUResult <= MultResult[31:0];
+            end
+            5'b01100: begin // MULTU
+			 MultResult <= $unsigned(A) * $unsigned(B);
+			 #5;
+			 HI_Input <= MultResult[63:32];
+			 LO_Input <= MultResult[31:0];
+            end
+			// SUBTRACTION, BEQ, BNE          
+			5'b00110: begin  
+					ALUResult[31:0] <= A - B;	 
+				  end 
 
-			// MULTIPLICATION -> MULTU
-			5'b01001: ALUResult <= $unsigned(A) * $unsigned(B);	
-
-			// SET LESS THAN, BLTZ, BGEZ  
-			5'b01010: ALUResult <= ($signed(A) < $signed(B)) ? 1'd1 : 64'b0;
-
-			// SET LESS THAN, SLTIU, SLTU
-			5'b01011: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1'd1 : 64'b0; 
+			// SET LESS THAN, BLTZ, BGEZ,  
+			5'b00111: ALUResult <= ($signed(A) < $signed(B)) ? 1'd1 : 64'b0; // check to make sure this is right
+			
+			//SLTIU, SLTU 
+			5'b11110: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1'd1 : 64'b0;
 
 			// NOR 		 
-			5'b01100: begin
-					ALUResult[31:0] <= ~(A | B);	
-					ALUResult[63:32] <= 0;
+			5'b01000: begin
+					ALUResult <= ~(A | B);	
 				  end
 
 			// XOR, XORI        
-			5'b01101: begin 
+			5'b01001: begin 
 					ALUResult[31:0] <= A ^ B;	
-					ALUResult[63:32] <= 0;
 				  end 
 
-			// ROTR, ROTRV      
-			5'b01110: ALUResult <= {32'b0, {(B >> A) | (B << (32 - A))}};
+			// ROTR, ROTR 
+			     
+			5'b01010: ALUResult <= {((B << LogicalOffset) >> LogicalOffset) | ((B >> LogicalOffset) << LogicalOffset)}; // need to check   
+			
+			 5'b11100: ALUResult <= {((B << A) >> A) | ((B >> A) << A)}; // ROTRV
 
-			// DIVIDE, DIV                           
-			5'b01111: begin					
-					ALUResult[31:0] <= $signed(A) / $signed(B);	// quotient
-					ALUResult[63:32] <= $signed(A) % $signed(B);	// remainder
-				  end 
-			
-			// DIVIDE, DIVU                 
-			5'b10000: begin					
-					ALUResult[31:0] <= $unsigned(A) / $unsigned(B);	// quotient
-					ALUResult[63:32] <= $unsigned(A) % $unsigned(B);	// remainder
-				  end 
-			
+
+//			// DIVIDE                            
+//			5'b01011: begin						
+//					ALUResult <= A / B;	// quotient
+//					HIReg <= A % B;	// remainder
+//				  end 
+
 			// MADD         
-			5'b10001: ALUResult <=  $signed(ALUResult) + $signed(A) * $signed(B); 
-
+			5'b01100: begin 
+			MultResult = {HI_Output, LO_Output} + A * B;
+			#5;
+			LO_Input = MultResult [31:0];
+			HI_Input = MultResult [63:32];
+            end
 			// MSUB         
-			5'b10010: ALUResult <= $signed(ALUResult) - $signed(A) * $signed(B);
+      
+			5'b01101: begin 
+			MultResult = {HI_Output, LO_Output} - A * B;
+			#5;
+			LO_Input = MultResult [31:0];
+			HI_Input = MultResult [63:32];
+            end
 
 			// MOVZ         
-			5'b10011: ALUResult <= (B == 32'b0) ? A : 64'b0;
+			5'b01110: ALUResult <= (B == 32'b0) ? A : 64'b0; // Need to double check that this performs as expected
 
 			// MOVN         
-			5'b10100: ALUResult <= (B == 32'b0) ? 64'b0 : A;
+			5'b01111: ALUResult <= (B == 32'b0) ? 64'b0 : A; // Need to double check that this performs as expected
 
 			// MFHI           
-			5'b10101: ALUResult <= {32'b0, ALUResult[63:32]};    //does this need to have an input HI? or is it supposed to be the hi of ALUResult
+			5'b10000: ALUResult <= HI_Output;
 
 			// MTHI              
-			5'b10110: ALUResult[63:32] <= A;
+			5'b10001: HI_Input <= A;
 
 			// MFLO
-			5'b10111: ALUResult <= {32'b0, ALUResult[31:0]};
+			5'b10010: begin 
+			     ALUResult <= LO_Output;
+			     end
 
 			// MTLO
-			5'b11000: ALUResult[31:0] <= A;
+			5'b10011: LO_Input <= A;
 
 			// LUI
-			5'b11001: begin						
+			5'b10100: begin						
 					ALUResult[31:16] <= B[15:0];
 					ALUResult[15:0] <= 16'b0;
-					ALUResult[63:32] <= 16'b0;
 				  end 
 
 			// SEB -> which is faster, concatenating or assigning?         
-			5'b11010: begin						
+			5'b10101: begin						
 					ALUResult[7:0] <= B[7:0];
-					ALUResult[63:8] <= 56'b0;
+					ALUResult[31:8] <= 56'b0;
 				  end 
 
 			// SEH                 
-			5'b11011: begin						
+			5'b10110: begin						
 					ALUResult[15:0] <= B[15:0];
-					ALUResult[63:16] <= 48'b0;
+					ALUResult[31:16] <= 48'b0;
 				  end 
 			
 			//NOP	  
@@ -198,5 +234,14 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero);
 					ALUResult <= 64'b0;
 				  end 
 		endcase
+
+		if (ALUResult == 0) begin
+			Zero <= 1;
+		end
+		
+		
 	end
+	
+	
 endmodule
+

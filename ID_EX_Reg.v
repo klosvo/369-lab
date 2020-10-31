@@ -8,10 +8,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RtRegIn, RdRegIn,
-                 regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn,
+                 regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, functIn,
                  BranchJumpIn, ALUOpIn, clk,
                   PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut, RtRegOut, RdRegOut,
-                  regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut,
+                  regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut, functOut,
                   BranchJumpOut, ALUOpOut);
                   
                   
@@ -19,11 +19,15 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RtRegIn, RdR
                   input [31:0] PCAddResultIn, ReadData1In, ReadData2In, OffsetIn;
                   input [20:16] RtRegIn;
                   input [15:11] RdRegIn;
-                  input [1:0] BranchJumpIn, ALUOpIn;
+                  input [5:0] functIn;
+                  input [4:0] ALUOpIn;
+                  input [2:0] BranchJumpIn; 
                   output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut;
                   output reg [31:0] PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut;
                   output reg [4:0] RtRegOut, RdRegOut;
-                  output reg [1:0] BranchJumpOut, ALUOpOut;
+                  output reg [5:0] functOut;
+                  output reg [2:0] BranchJumpOut;
+                  output reg [4:0] ALUOpOut;
 
     always @ (posedge clk) begin
         regDstOut = regDstIn;
@@ -40,5 +44,6 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RtRegIn, RdR
         RdRegOut = RdRegIn;
         BranchJumpOut = BranchJumpIn;
         ALUOpOut = ALUOpIn;
+        functOut = functIn;
     end
 endmodule

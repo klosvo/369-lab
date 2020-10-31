@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/15/2020 07:36:15 PM
+// Create Date: 10/18/2020 05:14:01 PM
 // Design Name: 
-// Module Name: Mux5Bit2To1
+// Module Name: Mux32Bit4To1
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,19 +20,21 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Mux5Bit2To1(out, inA, inB, sel);
+module Mux32Bit4To1(out, inA, inB, inC, inD, sel);
 
-    output reg [4:0] out;
+    output reg [31:0] out;
     
-    input [4:0] inA;
-    input [4:0] inB;
-    input sel;
+    input [31:0] inA, inB, inC, inD;
+    input [1:0] sel;
 
     /* Fill in the implementation here ... */ 
     always @ (inA, inB, sel) begin
-       if (sel == 1)
-            out <= inB;    
-       else
-            out <= inA;
+        case (sel)
+            2'b00: out <= inA;
+            2'b01: out <= inB;
+            2'b10: out <= inC;
+            2'b11: out <= inD;
+            default: out <= inA;
+        endcase
     end
 endmodule

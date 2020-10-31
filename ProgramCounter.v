@@ -24,12 +24,18 @@
 // location, 0x00000000H).
 ////////////////////////////////////////////////////////////////////////////////
 
-module ProgramCounter(Address, PCResult, Reset, Clk);
+module ProgramCounter(Address, PCResult, Reset, Clk, Debug);
 
 	input [31:0] Address;
 	input Reset, Clk;
-
+	   
+	output reg [31:0] Debug;
+	
 	output reg [31:0] PCResult;
+	
+	initial begin 
+	   PCResult <= 0;
+	end
 
     /* Please fill in the implementation here... */
     always @ (posedge Clk)
@@ -38,9 +44,8 @@ module ProgramCounter(Address, PCResult, Reset, Clk);
     		PCResult <= 32'h00000000;
     	else begin
     		PCResult <= Address;
+    		Debug <= PCResult;
     	end
     end
-
-
 endmodule
 

@@ -24,10 +24,14 @@ module BranchAnd(Branch, Zero, PCSrc);
     input [1:0] Branch;
     input Zero;
     
-    output reg [1:0] PCSrc;
+    output reg PCSrc;
+    
+    initial begin
+        PCSrc <= 0;
+    end
     
     always @ (*)begin
-        PCSrc = {Branch[1], Branch[0] & Zero};
+        PCSrc =  Branch[0] & Zero;
     end
     
     

@@ -50,8 +50,8 @@
 
 module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2, debug_reg16);
 
-	input [25:21] ReadRegister1;
-	input [20:16] ReadRegister2;
+	input [4:0] ReadRegister1;
+	input [4:0] ReadRegister2;
 	input [4:0] WriteRegister;
 	output reg [31:0] ReadData1, ReadData2;
 	input [31:0] WriteData;
@@ -76,7 +76,7 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
 
    // Write procedure
    always @(posedge Clk) begin
-      if (RegWrite == 1)
+      if (RegWrite == 1 & ~(WriteRegister == 0))
          RegFile[WriteRegister] <= WriteData;
    end
    
