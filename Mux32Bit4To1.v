@@ -28,7 +28,7 @@ module Mux32Bit4To1(out, inA, inB, inC, inD, sel);
     input [1:0] sel;
 
     /* Fill in the implementation here ... */ 
-    always @ (inA, inB, sel) begin
+    always @ * begin
         case (sel)
             2'b00: out <= inA;
             2'b01: out <= inB;

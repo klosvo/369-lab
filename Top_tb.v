@@ -33,8 +33,8 @@ module Top_tb(
 	initial begin
 	reset = 0;
         for (i = 0; i < 128; i = i+1) begin
-           #100 clk = 0;
-           #100 clk = 1;
+           #10 clk = 0;
+           #10 clk = 1;
         end
 	end
 	

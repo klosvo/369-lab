@@ -1,5 +1,4 @@
 `timescale 1ns / 1ps
-
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
@@ -51,10 +50,10 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
 //                          2'd04: ALUCtl <= 5'b10100; // lui
 
                           6'b000010: ALUCtl <= 5'b01010; // rotr 
-                          6'b000110: ALUCtl <= 5'b11100; //rotrv 
+                          //6'b000110: ALUCtl <= 5'b11100; //rotrv 
                           6'b000100: ALUCtl <= 5'b11101; // sllv
-                          6'b000111: ALUCtl <= 5'b11110; // srlv
-                          6'b000110: ALUCtl <= 5'b11110; // srav
+                          6'b000110: ALUCtl <= 5'b11110; // srlv
+                          //6'b000110: ALUCtl <= 5'b11110; // srav
 
                             6'b001010: ALUCtl <= 5'b00111; // movz
                             6'b001011: ALUCtl <= 5'b01111; // movn  
@@ -71,13 +70,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                                 ALUCtl <= 5'b10011; // mtlo
                                 end
 
-                        6'b001010: ALUCtl <= 5'b10011; // movz  19   (10)
-                        6'b001011: ALUCtl <= 5'b10100; // movn  20   (11)
-                        6'b010000: ALUCtl <= 5'b10101; // mfhi  21   (16)
-                        6'b010001: ALUCtl <= 5'b10110; // mthi  22   (17)
-                        6'b010010: ALUCtl <= 5'b10111; // mflo  23   (18)
-                        6'b010011: ALUCtl <= 5'b11000; // mtlo  24   (19)
-
+ 
                             6'b011000: begin
                                 HiLoWrite <= 1;
                                 ALUCtl <= 5'b00101; // mult   
@@ -106,8 +99,8 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                     endcase
                 end   
 //            default: ALUCtl <= 1'd7; // do nothing?//should not happen
-
         endcase
     end
     
 endmodule
+
