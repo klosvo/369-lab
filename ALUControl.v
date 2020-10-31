@@ -35,12 +35,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                     6'b000100: ALUCtl <= 5'b01101; //msub
                 endcase
             end
-            5'b01001: begin
-                case (SEH)
-                5'b10000:  ALUCtl <= 5'b10101; // seb
-                5'b11000:  ALUCtl <= 5'b10110; // seh
-                endcase
-            end
+            5'b01001: ALUCtl <= 5'b10110;
             5'b00000: // R-type
                 begin
                     case(funct)

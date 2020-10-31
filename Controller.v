@@ -79,15 +79,15 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         BranchJump <= 0;
         ALUOp <= 5'b01000; // 
         end
-        6'b011111: begin // special2  madd/msub
-        regDst <= 1;
+        6'b011111: begin // special3  seb/seh
+        regDst <= 0;
         ALUSource <= 0;
         MemToReg <= 1;
         regWrite <= 1;
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 5'b01000; // 
+        ALUOp <= 5'b01001; // 
         end
         6'b100011: begin // lw
         regDst <= 1;

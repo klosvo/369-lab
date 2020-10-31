@@ -212,16 +212,13 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 				  end 
 
 			// SEB -> which is faster, concatenating or assigning?         
-			5'b10101: begin						
-					ALUResult[7:0] <= B[7:0];
-					ALUResult[31:8] <= 56'b0;
-				  end 
-
 			// SEH                 
-			5'b10110: begin						
-					ALUResult[15:0] <= B[15:0];
-					ALUResult[31:16] <= 48'b0;
-				  end 
+			5'b10110: begin		
+			case (LogicalOffset)
+			     5'b11000: ALUResult = { {16{B[15]}}, B[15:0] };
+			     5'b10000: ALUResult = { {24{B[7]}}, B[7:0] };
+			endcase				
+		    end 
 		endcase
 		
 		
