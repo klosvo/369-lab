@@ -27,24 +27,42 @@
 //
 // Op|'ALUControl' value | Description | Notes
 // ==========================
-// ADDITION       | 0000 | ALUResult = A + B
-// SUBRACTION     | 0001 | ALUResult = A - B
-// MULTIPLICATION | 0010 | ALUResult = A * B        (see notes below)
-// AND            | 0011 | ALUResult = A and B
-// OR             | 0100 | ALUResult = A or B
-// SET LESS THAN  | 0101 | ALUResult =(A < B)? 1:0  (see notes below)
-// SET EQUAL      | 0110 | ALUResult =(A=B)  ? 1:0
-// SET NOT EQUAL  | 0111 | ALUResult =(A!=B) ? 1:0
-// LEFT SHIFT     | 1000 | ALUResult = A << B       (see notes below)
-// RIGHT SHIFT    | 1001 | ALUResult = A >> B	    (see notes below)
-// COUNT ONES     | 1010 | ALUResult = A CLO        (see notes below)
-// COUNT ZEROS    | 1011 | ALUResult = A CLZ        (see notes below)
+// AND, ANDI            			     | 00000 | ALUResult = A and B
+// OR, ORI, SEB, SEH    			     | 00001 | ALUResult = A or B
+// ADDITION, lw, sw, lb, sb, lh, sh      | 00010 | ALUResult = A + B
+// ADDITION, ADDU, ADDUI                 | 00011 | ALUResult = A + B
+// SUBRACTION, BEQ, BNE       			 | 00100 | ALUResult = A - B
+// SUBRACTION, SUBU       			     | 00101 | ALUResult = A - B
+// LEFT SHIFT, SLL, SLLV	    		 | 00110 | ALUResult = A << B
+// RIGHT SHIFT, SRL, SRLV, SRA, SRAV     | 00111 | ALUResult = A >> B
+// MULTIPLICATION, MUL, MULT 		     | 01000 | ALUResult = A * B
+// MULTIPLICATION, MULTU 		         | 01001 | ALUResult = A * B
+// SET LESS THAN, BLTZ, BGEZ  	         | 01010 | ALUResult =(A < B)? 1:0
+// SET LESS THAN, SLTIU, SLTU  	         | 01011 | ALUResult =(A < B)? 1:0
+// NOR   					             | 01100 | ALUResult = ~(A or B)
+// XOR, XORI					         | 01101 | ALUResult = A xor B
+// ROTR, ROTRV					         | 01110 | Rotate B Right
+// DIVIDE					             | 01111 | ALUResult = A / B
+// DIVIDE, DIVU					         | 10000 | ALUResult = A / B
+// MADD						             | 10001 | ALUResult = ALUResult + A * B
+// MSUB						             | 10010 | ALUResult = ALUResult - A * B
+// MOVZ						             | 10011 | if (B == 0), ALUResult = A, else ALUResult = 0;
+// MOVN						             | 10100 | if (B == 0), ALUResult = 0, else ALUResult = A;
+// MFHI						             | 10101 | Move ALUResultHI into the lower 32 bits of ALUResult;
+// MTHI						             | 10110 | Move A into the upper 32 bits of ALUResult;
+// MFLO						             | 10111 | Move ALUResultLO into the lower 32 bits of ALUResult;
+// MTLO						             | 11000 | Move A into the lower 32 bits of ALUResult;
+// LUI						             | 11001 | Move lowest 16 bits of B into bits [31:16] of ALUResult;
+// SEB						             | 11010 | Move lowest 8 bits of B into lowest 8 bits of ALUResult;
+// SEH						             | 11011 | Move lowest 16 bits of B into lowest 16 bits of ALUResult; 
+
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_Output, LO_Output);
 
 	input [4:0] ALUControl; 	// Control bits for ALU operation
+
     input [4:0] LogicalOffset;                            // you need to adjust the bitwidth as needed
 	input [31:0] A, B;	 
 	input regWrite;   	// Inputs
@@ -72,15 +90,15 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 		HI_Input <= HI_Output;
 		LO_Input <= LO_Output;
 
-		case(ALUControl)
 
+		case(ALUControl)
 			// AND, ANDI
 			5'b00000: begin 
 					ALUResult <= A & B;	
 					
 				  end 
 
-			// OR, ORI, SEB, SEH???          
+			// OR, ORI          
 			5'b00001: begin
 					ALUResult[31:0] <= A | B;
 						
@@ -150,6 +168,7 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			
 			 5'b11100: ALUResult <= {((B << A) >> A) | ((B >> A) << A)}; // ROTRV
 
+
 //			// DIVIDE                            
 //			5'b01011: begin						
 //					ALUResult <= A / B;	// quotient
@@ -164,6 +183,7 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			HI_Input = MultResult [63:32];
             end
 			// MSUB         
+      
 			5'b01101: begin 
 			MultResult = {HI_Output, LO_Output} - A * B;
 			#5;
@@ -207,6 +227,11 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			5'b10110: begin						
 					ALUResult[15:0] <= B[15:0];
 					ALUResult[31:16] <= 48'b0;
+				  end 
+			
+			//NOP	  
+			5'b11111: begin						
+					ALUResult <= 64'b0;
 				  end 
 		endcase
 
