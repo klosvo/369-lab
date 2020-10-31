@@ -25,6 +25,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
             5'b00011: ALUCtl <= 5'b00001; // ori
             5'b00100: ALUCtl <= 5'b01001; // xori
             5'b00101: ALUCtl <= 5'b00111; // slti
+            5'b01011: ALUCtl <= 5'b11001; // sltiu
             5'b00111: ALUCtl <= 5'b10111; // addui
             5'b01000: begin
                 HiLoWrite <= 1;
@@ -92,7 +93,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                           6'b100111: ALUCtl <= 5'b01000; // nor
 
                           6'b101010: ALUCtl <= 5'b00111; // slt
-//                        // 2'd43: ALUCtl <= 5'b00111; // sltu 
+                          6'b101011: ALUCtl <= 5'b11001; // sltu 
 
                     endcase
                 end   

@@ -139,10 +139,14 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 				  end 
 
 			// SET LESS THAN, BLTZ, BGEZ,  
-			5'b00111: ALUResult <= ($signed(A) < $signed(B)) ? 1'd1 : 64'b0; // check to make sure this is right
+			5'b00111: ALUResult <= ($signed(A) < $signed(B)) ? 1 : 0; // check to make sure this is right
 			
 			//SLTIU, SLTU 
-			5'b11110: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1'd1 : 64'b0;
+			5'b11001: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1 : 0;
+			
+//			5'b11010: ;
+//			5'b11100: ;
+
 
 			// NOR 		 
 			5'b01000: begin

@@ -257,7 +257,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
-        ALUOp <= 0; // change to sltu code
+        ALUOp <= 5'b01011; // change to sltu code
         end
         
             default: begin
