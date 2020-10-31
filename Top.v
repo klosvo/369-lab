@@ -51,7 +51,7 @@ module Top( input Clk, Reset
     wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData, MemOffset;
     wire [4:0] MemRd;
     wire [1:0] MemBranchJump;
-    wire MemregWrite, MemMemWrite, MemMemRead, MemMemToReg, MemZero;
+    wire MemregWrite, MemMemWrite, MemRegWriteResult, MemMemRead, MemMemToReg, MemZero;
     wire [1:0] PCSrc;
   
   //WB stage wires
@@ -115,10 +115,10 @@ module Top( input Clk, Reset
                         
     // Memory Access Stage
    DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, MemReadData);
-   //BranchAnd BAnd(MemBranchJump, MemZero, PCSrc);
+   And regWriteAnd(MemZero, MemregWrite, MemRegWriteResult);
    
    // MEM/WB
-   MEM_WB_Reg MemWbReg(MemReadData, MemALUResult, MemRd, MemMemToReg, MemregWrite, Clk,
+   MEM_WB_Reg MemWbReg(MemReadData, MemALUResult, MemRd, MemMemToReg, MemRegWriteResult, Clk,
                        MemoryOut, ALUOut, WBrd, WBMemToReg, WBRegWrite);
                        
    // Write Back Stage

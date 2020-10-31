@@ -68,7 +68,7 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
     end
 
     always @ (ALUControl, A, B) begin
-		Zero <= 0;
+		Zero <= 1;
 		HI_Input <= HI_Output;
 		LO_Input <= LO_Output;
 
@@ -182,11 +182,15 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
             end
 
 			// MOVZ         
-			5'b01110: ALUResult <= (B == 32'b0) ? A : 64'b0; // Need to double check that this performs as expected
-
+			5'b01110: begin 
+			     ALUResult <= A; // Need to double check that this performs as expected
+			     Zero <= (B == 0);
+            end
 			// MOVN         
-			5'b01111: ALUResult <= (B == 32'b0) ? 64'b0 : A; // Need to double check that this performs as expected
-
+			5'b01111: begin
+			      ALUResult <= A; // Need to double check that this performs as expected
+			     Zero <= ~(B == 0);
+            end
 			// MFHI           
 			5'b10000: ALUResult <= HI_Output;
 
@@ -219,10 +223,6 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 					ALUResult[31:16] <= 48'b0;
 				  end 
 		endcase
-
-		if (ALUResult == 0) begin
-			Zero <= 1;
-		end
 		
 		
 	end

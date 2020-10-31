@@ -54,8 +54,8 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                           6'b000110: ALUCtl <= 5'b11110; // srlv
                           6'b000111: ALUCtl <= 5'b01010; // srav
 
-                            6'b001010: ALUCtl <= 5'b00111; // movz
-                            6'b001011: ALUCtl <= 5'b01111; // movn  
+                          6'b001010: ALUCtl <= 5'b01110; // movz
+                          6'b001011: ALUCtl <= 5'b01111; // movn  
 
 
                             6'b010000: ALUCtl <= 5'b10000; // mfhi
