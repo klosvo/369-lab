@@ -42,10 +42,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_Output, LO_Output);
+module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, HI_Output, LO_Output);
 
 	input [4:0] ALUControl; 	// Control bits for ALU operation
-    input [4:0] LogicalOffset;                            // you need to adjust the bitwidth as needed
+    input [4:0] rs, LogicalOffset;                            // you need to adjust the bitwidth as needed
 	input [31:0] A, B;	 
 	input regWrite;   	// Inputs
 	
@@ -102,9 +102,19 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			5'b11101: ALUResult <= B << A;	   
 
 			// RIGHT SHIFT, SRL, SRLV, SRA, SRAV		 
-			5'b00100: ALUResult <= B >> LogicalOffset; 
-			5'b11110: ALUResult <= B >> A;        		
-
+			5'b00100: begin   // srl and rotr
+			case (rs)
+			     5'b00001: ALUResult <= (B >> LogicalOffset) | (B << (32 - LogicalOffset));
+			     5'b00000: ALUResult <= B >> LogicalOffset;
+			endcase 		
+            end
+			
+			5'b11110: begin   // srlv and rotrv
+			case (LogicalOffset)
+			     5'b00001: ALUResult <=  B >> A | B << (32 - A);
+			     5'b00000: ALUResult <= B >> A;
+			endcase 		
+            end
 			// MULTIPLICATION -> MUL, MULT, MULTU		
 			5'b00101: begin // mult
 			 MultResult <= $signed(A) * $signed(B);
@@ -143,12 +153,8 @@ module ALU32Bit(ALUControl, A, B, regWrite, LogicalOffset, ALUResult, Zero, HI_O
 			5'b01001: begin 
 					ALUResult[31:0] <= A ^ B;	
 				  end 
-
-			// ROTR, ROTR 
-			     
-			5'b01010: ALUResult <= {((B << LogicalOffset) >> LogicalOffset) | ((B >> LogicalOffset) << LogicalOffset)}; // need to check   
-			
-			 5'b11100: ALUResult <= {((B << A) >> A) | ((B >> A) << A)}; // ROTRV
+            5'b11111:  ALUResult <= ((B >> LogicalOffset) & {32{~B[31]}}) | (~(~B >> LogicalOffset) & {32{B[31]}}); //sra
+            5'b01010: ALUResult <= ((B >> A) & {32{~B[31]}}) | (~(~B >> A) & {32{B[31]}});
 
 //			// DIVIDE                            
 //			5'b01011: begin						

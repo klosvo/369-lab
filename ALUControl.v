@@ -45,15 +45,13 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
                     case(funct)
                           6'b000000: ALUCtl <= 5'b00011; // sll
                           6'b000010: ALUCtl <= 5'b00100; // srl
-                          6'b000011: ALUCtl <= 5'b00100; // sra
+                          6'b000011: ALUCtl <= 5'b11111; // sra
 
 //                          2'd04: ALUCtl <= 5'b10100; // lui
 
-                          6'b000010: ALUCtl <= 5'b01010; // rotr 
-                          //6'b000110: ALUCtl <= 5'b11100; //rotrv 
                           6'b000100: ALUCtl <= 5'b11101; // sllv
                           6'b000110: ALUCtl <= 5'b11110; // srlv
-                          //6'b000110: ALUCtl <= 5'b11110; // srav
+                          6'b000111: ALUCtl <= 5'b01010; // srav
 
                             6'b001010: ALUCtl <= 5'b00111; // movz
                             6'b001011: ALUCtl <= 5'b01111; // movn  

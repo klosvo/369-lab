@@ -11,18 +11,8 @@ module SignExtension(in, out);
     input [15:0] in;
     
     /* A 32-Bit output word */
-    output reg [31:0] out;
+    output [31:0] out;
     
-    always @ (in)
-    begin
-    	if(in[15] == 0) begin
-    		out[15:0] <= in;
-    		out[31:16] <= 0;
-    		end
-    	else begin
-    		out[15:0] <= in;
-    		out[31:16] <= 1;
-    		end
-    end
-
+    /* Fill in the implementation here ... */
+    assign out =  { {16{in[15]}}, in };
 endmodule
