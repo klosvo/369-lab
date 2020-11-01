@@ -4,17 +4,18 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
+module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
 );
     
 	input [4:0] ALUOp; 	// Control bits for ALU operation
 	input [5:0] funct;
 	input [4:0] SEH;
 	output reg [4:0] ALUCtl;
-	output reg HiLoWrite;
+	output reg HiLoWrite, MultBit;
 
     always @ (ALUOp, funct) begin 
             HiLoWrite <= 0;
+            MultBit <= 0;
             case (ALUOp)
             
             5'b00010:    // lw, sw, lb, sb, lh, sh
@@ -28,11 +29,19 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite
             5'b01011: ALUCtl <= 5'b11001; // sltiu
             5'b00111: ALUCtl <= 5'b10111; // addui
             5'b01000: begin
-                HiLoWrite <= 1;
                 case(funct)
-                    6'b000000: ALUCtl <= 5'b01100; //madd
-                    6'b000010: ALUCtl <= 5'b11000; //mul
-                    6'b000100: ALUCtl <= 5'b01101; //msub
+                    6'b000000: begin
+                       ALUCtl <= 5'b11010; //madd
+                       HiLoWrite <= 1;
+                    end
+                    6'b000010: begin
+                       ALUCtl <=  5'b11000; //mul
+                       MultBit <= 1;
+                    end
+                    6'b000100: begin
+                        ALUCtl <= 5'b01101; //msub
+                        HiLoWrite <= 1;
+                    end
                 endcase
             end
             5'b01001: ALUCtl <= 5'b10110;

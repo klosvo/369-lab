@@ -42,11 +42,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, HI_Output, LO_Output);
+module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, MultResult, HI_in, LO_in);
 
 	input [4:0] ALUControl; 	// Control bits for ALU operation
     input [4:0] rs, LogicalOffset;                            // you need to adjust the bitwidth as needed
-	input [31:0] A, B;	 
+	input [31:0] A, B, HI_in, LO_in;	 
 	input regWrite;   	// Inputs
 	
     
@@ -55,13 +55,7 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 	
 	reg [31:0] RegOutput;
 	
-	reg [63:0] MultResult;
-	
-	
-	reg [31:0] HI_Input, LO_Input;
-	output wire [31:0] HI_Output, LO_Output;
-	
-	HiLoRegs hilo(HI_Input, LO_Input, regWrite, HI_Output, LO_Output);
+	output reg [63:0] MultResult;	
 	
     initial begin
         MultResult = 0;
@@ -69,8 +63,6 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 
     always @ (ALUControl, A, B) begin
 		Zero <= 1;
-		HI_Input <= HI_Output;
-		LO_Input <= LO_Output;
 
 		case(ALUControl)
 
@@ -118,20 +110,13 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 			// MULTIPLICATION -> MUL, MULT, MULTU		
 			5'b00101: begin // mult
 			 MultResult <= $signed(A) * $signed(B);
-			 #5;
-			 HI_Input <= MultResult[63:32];
-			 LO_Input <= MultResult[31:0];
+			
             end
             5'b11000: begin // mul
                 MultResult <= A * B;
-                #5;
-                ALUResult <= MultResult[31:0];
             end
             5'b01100: begin // MULTU
 			 MultResult <= $unsigned(A) * $unsigned(B);
-			 #5;
-			 HI_Input <= MultResult[63:32];
-			 LO_Input <= MultResult[31:0];
             end
 			// SUBTRACTION, BEQ, BNE          
 			5'b00110: begin  
@@ -144,7 +129,6 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 			//SLTIU, SLTU 
 			5'b11001: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1 : 0;
 			
-//			5'b11010: ;
 //			5'b11100: ;
 
 
@@ -167,43 +151,37 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 //				  end 
 
 			// MADD         
-			5'b01100: begin 
-			MultResult = {HI_Output, LO_Output} + A * B;
-			#5;
-			LO_Input = MultResult [31:0];
-			HI_Input = MultResult [63:32];
+			5'b11010: begin 
+			MultResult = {HI_in, LO_in} + (A * B);
             end
 			// MSUB         
 			5'b01101: begin 
-			MultResult = {HI_Output, LO_Output} - A * B;
-			#5;
-			LO_Input = MultResult [31:0];
-			HI_Input = MultResult [63:32];
+			MultResult = {HI_in, LO_in} - (A * B);
             end
 
 			// MOVZ         
 			5'b01110: begin 
-			     ALUResult <= A; // Need to double check that this performs as expected
+			     ALUResult <= A; 
 			     Zero <= (B == 0);
             end
 			// MOVN         
 			5'b01111: begin
-			      ALUResult <= A; // Need to double check that this performs as expected
+			      ALUResult <= A; 
 			     Zero <= ~(B == 0);
             end
 			// MFHI           
-			5'b10000: ALUResult <= HI_Output;
+			5'b10000: ALUResult <= HI_in;
 
 			// MTHI              
-			5'b10001: HI_Input <= A;
+			5'b10001: MultResult[63:32] <= A;
 
 			// MFLO
 			5'b10010: begin 
-			     ALUResult <= LO_Output;
+			     ALUResult <= LO_in;
 			     end
 
 			// MTLO
-			5'b10011: LO_Input <= A;
+			5'b10011: MultResult[31:0] <= A;
 
 			// LUI
 			5'b10100: begin						

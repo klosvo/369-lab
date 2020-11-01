@@ -70,7 +70,7 @@ module Controller(instruction, regDst, ALUSource, MemToReg, regWrite, MemRead, M
         ALUOp <= 5'b00111; // todo: Change to addu Code
         end
         6'b011100: begin // special2  madd/msub
-        regDst <= 1;
+        regDst <= 0;
         ALUSource <= 0;
         MemToReg <= 1;
         regWrite <= 1;
