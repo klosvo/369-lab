@@ -302,10 +302,6 @@ module Controller(instruction, funct,
         ALUOp <= 5'b01011; // change to sltu code
         MulOp = 0;
         end
-        
-            default: begin
-                controlOut <= 16'b0;
-            end
             
     endcase
     

@@ -1,7 +1,6 @@
 `timescale 1ns / 1ps
 
 
-//INCOMPLETE
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
@@ -18,7 +17,9 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
                   input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, clk, flush;
                   input [1:0] dataTypeIn;
                   input [31:0] PCAddResultIn, ReadData1In, ReadData2In, OffsetIn;
-                  input [15:0] ControlSig;
+                  input [2:0] BranchJumpIn;
+                  input [4:0] ALUOpIn;
+//                  input [15:0] ControlSig;
                   input [4:0] RsRegIn, RtRegIn,  RdRegIn;
                   input [5:0] functIn; 
                   output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut;
@@ -65,8 +66,8 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
         RsRegOut = RsRegIn;
         RtRegOut = RtRegIn;
         RdRegOut = RdRegIn;
-        BranchJumpOut = ControlSig[7:5];
-        ALUOpOut = ControlSig[4:0];
+        BranchJumpOut = BranchJumpIn;
+        ALUOpOut = ALUOpIn;
         functOut = functIn;
         end
     end
