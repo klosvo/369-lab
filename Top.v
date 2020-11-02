@@ -40,7 +40,8 @@ module Top( input Clk, Reset,
    wire [5:0] InstructionIn, funct;
    wire [4:0] IDALUOp, IDrs, IDrt, IDrd;
    wire [2:0] IDbranchJump;
-   wire IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite;
+   wire [1:0] IDdataType;
+   wire IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IFIDWrite, PCWrite, FlushIFID, FlushIDEX, mulOp;
    
    // Execute Stage wires
    wire [63:0] MultResult;
@@ -50,14 +51,14 @@ module Top( input Clk, Reset,
    wire [4:0] EXrtReg, EXrsReg, EXrdReg, SelRd;
    wire [4:0] ALUcontrolWire;
    wire [2:0] EXBranchOp;
-   wire [1:0] EXbranchJump, FwdCtrA, FwdCtrB;
+   wire [1:0] EXbranchJump, FwdCtrA, FwdCtrB, EXdataType;
    wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag, HiLoWrite, MultBit;
    
    //Memory Stage wires
     wire [63:0] MemMultResult;
     wire [31:0]  BranchAddress, MemALUResult,MemReadData1, MemReadData2, MemReadData, MemOffset, MulOut, LO, HI, MemResult;
     wire [4:0] MemRd;
-    wire [1:0] MemBranchJump;
+    wire [1:0] MemBranchJump, DataType;
     wire MemregWrite, MemMemWrite, MemRegWriteResult, MemMemRead, MemMemToReg, MemZero, MemHiLoWrite, MemMultBit;
     wire [1:0] PCSrc;
   
@@ -75,33 +76,42 @@ module Top( input Clk, Reset,
     
     assign Debug_Write_Register = RegWriteData;
 
-    // seven SegmentDisplay
-     ClkDiv clock_divider (Clk, Reset, NewClk);
-     Two4DigitDisplay two_4_digit_display(Clk, Debug_Program_Counter[15:0], Debug_Write_Register[15:0], out7, en_out);
-    
+    // sevenSegment Display
+     //ClkDiv clock_divider (Clk, Reset, NewClk);
+     //Two4DigitDisplay two_4_digit_display(Clk, Debug_Program_Counter[15:0], Debug_Write_Register[15:0], out7, en_out);
+     assign NewClk = Clk;
+     
+   
+        
+    //todo add mux
     
     
      // fetch stage
     Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
-	ProgramCounter counter(Address, PCResult, Reset, NewClk, Debug_Program_Counter);
+	ProgramCounter counter(Address, PCWrite, PCResult, Reset, NewClk, Debug_Program_Counter);
 	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
 	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
 	
 	// IF/ID
-	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, NewClk, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
+	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, NewClk, IFIDWrite, FlushIFID, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
 	
 	// Decode Stage
-	Controller control(InstructionIn, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp);
+	Controller control(InstructionIn, funct, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp, mulOp, IDdataType);
 	RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, NewClk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
 	SignExtension signExtend(IDinstructionOffset, IDSignExtendedOffset);
 	
+	  // hazard detection unit
+     HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, IDrs, IDrt, FlushIFID, FlushIDEX, IFIDWrite, PCWrite, mulOp);
 	
+	// mux for control signals that depend on hazard detection unit
+    //Mux16Bit2to1 controlMux(MuxControlOut, 16'b0, ControlOut, MuxSig);
+
 	
 	// ID/EX
 	ID_EX_Reg IdExReg(IDRegPCAddResult, ReadData1, ReadData2, IDSignExtendedOffset, IDrs, IDrt, IDrd,
-	                   IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp, NewClk,
+	                    IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp, NewClk, IDdataType,
 	                   EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrtReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
-	                   EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp);
+	                    EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp, EXdataType, FlushIDEX);
 	                   
 	                   assign SEH = EXOffset[10:6];
 	                   
@@ -123,13 +133,13 @@ module Top( input Clk, Reset,
     
     
     // EX/MEM
-    EX_MEM_Reg ExMemReg(MultResult, EXBranchAddress, ALUResult, RegValB, RegValA, EXOffset, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg,
+    EX_MEM_Reg ExMemReg(MultResult, EXBranchAddress, ALUResult, RegValB, RegValA, EXOffset, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, EXdataType, ExMemToReg,
                         MultBit, HiLoWrite, zeroFlag, NewClk,
-                        MemMultResult, BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemOffset, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, MemMemToReg,
+                        MemMultResult, BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemOffset, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, DataType, MemMemToReg,
                         MemMultBit, MemHiLoWrite, MemZero);
                         
     // Memory Access Stage
-   DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, MemReadData);
+   DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, DataType, MemReadData);
    And regWriteAnd(MemZero, MemregWrite, MemRegWriteResult);
    
    multiplyUnit MU(MemMultResult, MulOut, HI, LO, MemHiLoWrite);

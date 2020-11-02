@@ -8,27 +8,51 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtRegIn, RdRegIn,
-                 regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, functIn,
-                 BranchJumpIn, ALUOpIn, clk,
+                  regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, functIn,
+                 BranchJumpIn, ALUOpIn, clk, dataTypeIn,
                   PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut, RsRegOut, RtRegOut, RdRegOut,
-                  regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut, functOut,
-                  BranchJumpOut, ALUOpOut);
+                   regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut, functOut,
+                  BranchJumpOut, ALUOpOut, dataTypeOut, flush);
                   
                   
-                  input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, clk;
+                  input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, clk, flush;
+                  input [1:0] dataTypeIn;
                   input [31:0] PCAddResultIn, ReadData1In, ReadData2In, OffsetIn;
                   input [4:0] RsRegIn, RtRegIn,  RdRegIn;
                   input [5:0] functIn;
                   input [4:0] ALUOpIn;
                   input [2:0] BranchJumpIn; 
                   output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut;
+                  output reg [1:0] dataTypeOut;
                   output reg [31:0] PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut;
                   output reg [4:0] RsRegOut, RtRegOut, RdRegOut;
                   output reg [5:0] functOut;
                   output reg [2:0] BranchJumpOut;
                   output reg [4:0] ALUOpOut;
+                  // Control Out = {IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp}; 
 
     always @ (posedge clk) begin
+    if (flush) begin
+        dataTypeOut = 0;
+        regDstOut = 0;
+        ALUSourceOut = 0;
+        MemToRegOut = 0;
+        regWriteOut= 0;
+        MemReadOut = 0;
+        MemWriteOut = 0;
+        PCAddResultOut = 0;
+        ReadData1Out = 0;
+        ReadData2Out = 0;
+        OffsetOut = 0;
+        RsRegOut = 0;
+        RtRegOut = 0;
+        RdRegOut = 0;
+        BranchJumpOut = 0;
+        ALUOpOut = 0;
+        functOut = 0;
+    end
+    else begin
+        dataTypeOut = dataTypeIn;
         regDstOut = regDstIn;
         ALUSourceOut = ALUSourceIn;
         MemToRegOut = MemToRegIn;
@@ -45,5 +69,6 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
         BranchJumpOut = BranchJumpIn;
         ALUOpOut = ALUOpIn;
         functOut = functIn;
+        end
     end
 endmodule
