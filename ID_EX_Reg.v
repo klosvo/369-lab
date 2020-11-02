@@ -18,10 +18,9 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
                   input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, clk, flush;
                   input [1:0] dataTypeIn;
                   input [31:0] PCAddResultIn, ReadData1In, ReadData2In, OffsetIn;
+                  input [15:0] ControlSig;
                   input [4:0] RsRegIn, RtRegIn,  RdRegIn;
-                  input [5:0] functIn;
-                  input [4:0] ALUOpIn;
-                  input [2:0] BranchJumpIn; 
+                  input [5:0] functIn; 
                   output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut;
                   output reg [1:0] dataTypeOut;
                   output reg [31:0] PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut;
@@ -66,8 +65,8 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
         RsRegOut = RsRegIn;
         RtRegOut = RtRegIn;
         RdRegOut = RdRegIn;
-        BranchJumpOut = BranchJumpIn;
-        ALUOpOut = ALUOpIn;
+        BranchJumpOut = ControlSig[7:5];
+        ALUOpOut = ControlSig[4:0];
         functOut = functIn;
         end
     end

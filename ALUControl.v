@@ -86,7 +86,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
 //                        // 2'd27: ALUCtl <= 5'b01011; // divu  
 
 
-                            6'b100000: ALUCtl <= 5'b00010; // add/addi	
+                            6'b100000: ALUCtl <= 5'b00010; // add/addi  
                             6'b100001: ALUCtl <= 5'b10111; // addu/addiu  
                             6'b100010: ALUCtl <= 5'b00110; // sub
 //                        // 2'd35: ALUCtl <= 5'b00110; // subu
@@ -106,4 +106,3 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
     end
     
 endmodule
-

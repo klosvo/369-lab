@@ -67,7 +67,6 @@ module Top( input Clk, Reset,
   wire [4:0] WBrd;
   wire WBRegWrite, WBMemToReg;
   
-  
    
    // initial and assignemnts
     initial begin
@@ -120,8 +119,14 @@ module Top( input Clk, Reset,
 	                   Mux32Bit4To1 forwardMuxB(RegValB, EXReadData2, MemALUResult, RegWriteData, 0, FwdCtrB);
 	                   
 	// Execution Stage
+
     Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
-    Mux32Bit2To1 ALUsrcMux (ALUInput, RegValB, EXOffset, EXALUSource);
+    Mux32Bit2To1 ALUsrcMux (ALUInput, EXReadData2, EXOffset, EXALUSource);
+    
+                     //forwarding Muxes
+                     Mux32Bit4To1 forwardMuxA(RegValA, EXReadData1, MemALUResult, RegWriteData, 0, FwdCtrA);
+                     Mux32Bit4To1 forwardMuxB(RegValB, ALUInput, MemALUResult, RegWriteData, 0, FwdCtrB);
+    
     Mux5Bit2To1 RegDstMux (SelRd, EXrdReg, EXrtReg, EXregDst);
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);
     ALUControl ALUcontroller(EXALUOp, EXfunct, SEH, ALUcontrolWire, HiLoWrite, MultBit); //EXALUOp, EXOffset, ALUcontrol
@@ -153,7 +158,5 @@ module Top( input Clk, Reset,
                        
    // Write Back Stage
    Mux32Bit2To1 MemToRegMux(RegWriteData, MemoryOut, ALUOut, WBMemToReg);
-   
-    
     
 endmodule

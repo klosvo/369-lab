@@ -37,7 +37,7 @@
 
 module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData); 
 
-    input [31:0] Address; 	// Input Address 
+    input [31:0] Address;   // Input Address 
     input [31:0] WriteData; // Data that needs to be written into the address 
     input MemWrite; 		// Control signal for memory write 
     input MemRead; 			// Control signal for memory read 
@@ -45,9 +45,9 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
 
     output reg[31:0] ReadData; // Contents of memory location at Address
 
-    
     reg [31:0] memory [0:1023];
-     integer i;
+  
+    integer i;
     
     initial begin
        for(i=0; i<1024; i = i+1) begin
@@ -57,8 +57,7 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
        memory[1] <= 32'hc0c0b0b0;
        memory[5] <= 32'hff00000a;
      end
-      
-    
+
     always @(*) begin
         if (MemRead == 1) begin
 //            ReadData <= memory[Address[11:2]];

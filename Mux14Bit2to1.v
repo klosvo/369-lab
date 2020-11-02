@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/15/2020 07:36:15 PM
+// Create Date: 11/01/2020 06:44:23 PM
 // Design Name: 
-// Module Name: Mux5Bit2To1
+// Module Name: Mux14Bit2to1
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,12 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Mux5Bit2To1(out, inA, inB, sel);
+module Mux14Bit2to1(out, inA, inB, sel);
 
-    output reg [4:0] out;
+    output reg [13:0] out;
     
-    input [4:0] inA;
-    input [4:0] inB;
+    input [13:0] inA;
+    input [13:0] inB;
     input sel;
 
     /* Fill in the implementation here ... */ 
@@ -36,3 +36,4 @@ module Mux5Bit2To1(out, inA, inB, sel);
             out <= inA;
     end
 endmodule
+
