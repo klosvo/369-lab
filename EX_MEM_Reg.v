@@ -7,17 +7,17 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module EX_MEM_Reg(BranchAddResultIn, ALUResultIn, MemDataIn, ReadData1In, OffsetIn, rdRegIn, RegWriteIn, MemWriteIn, MemReadIn, BranchIn, MemToRegIn, ZeroIn, clk, 
-                  BranchAddResultOut, ALUResultOut, MemDataOut, ReadData1Out, OffsetOut, rdRegOut, RegWriteOut, MemWriteOut, MemReadOut, BranchOut, MemToRegOut, ZeroOut);
+module EX_MEM_Reg(BranchAddResultIn, ALUResultIn, MemDataIn, ReadData1In, OffsetIn, rdRegIn, RegWriteIn, MemWriteIn, MemReadIn, BranchIn, dataTypeIn, MemToRegIn, ZeroIn, clk, 
+                  BranchAddResultOut, ALUResultOut, MemDataOut, ReadData1Out, OffsetOut, rdRegOut, RegWriteOut, MemWriteOut, MemReadOut, BranchOut, dataTypeOut, MemToRegOut, ZeroOut);
                   
                   input [31:0] BranchAddResultIn, ALUResultIn, MemDataIn, ReadData1In, OffsetIn;
                   input [4:0] rdRegIn;
                   input RegWriteIn, MemWriteIn, MemReadIn, MemToRegIn, ZeroIn, clk;
-                  input [1:0] BranchIn;
+                  input [1:0] BranchIn, dataTypeIn;
                   output reg [31:0] BranchAddResultOut, ALUResultOut, MemDataOut, ReadData1Out, OffsetOut;
                   output reg [4:0] rdRegOut;
                   output reg RegWriteOut, MemWriteOut, MemReadOut, MemToRegOut, ZeroOut;
-                  output reg [1:0] BranchOut;
+                  output reg [1:0] BranchOut, dataTypeOut;
                   
       always @ (posedge clk) begin
          BranchAddResultOut = BranchAddResultIn;
@@ -29,7 +29,8 @@ module EX_MEM_Reg(BranchAddResultIn, ALUResultIn, MemDataIn, ReadData1In, Offset
          MemReadOut = MemReadIn;
          MemToRegOut = MemToRegIn;
          ZeroOut = ZeroIn;
-         BranchOut = BranchIn;   
+         BranchOut = BranchIn;
+         dataTypeOut = dataTypeIn;   
          ReadData1Out = ReadData1In;
          OffsetOut = OffsetIn;
       end
