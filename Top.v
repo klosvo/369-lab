@@ -21,13 +21,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Top( input Clk, Reset
+module Top( input Clk, Reset,
+            output [6:0] out7,
+            output [7:0] en_out
     );
     //debug
     (* mark_debug = "true" *)wire [31:0] Debug_Program_Counter, Debug_HI, Debug_LO, Debug_Write_Register;
  // fetchStageWires
    wire [31:0] PCResult, PCAddResult, Address, FetchedInstruction;
    reg [31:0] PCAddAmount;
+   
+   // seven segement wires
+   wire NewClk;
    
   // decode stage wires
    wire [31:0] IDRegPCAddResult, IDRegInstruction, ReadData1, ReadData2, IDSignExtendedOffset;
@@ -70,26 +75,31 @@ module Top( input Clk, Reset
     
     assign Debug_Write_Register = RegWriteData;
 
+    // seven SegmentDisplay
+     ClkDiv clock_divider (Clk, Reset, NewClk);
+     Two4DigitDisplay two_4_digit_display(Clk, Debug_Program_Counter[15:0], Debug_Write_Register[15:0], out7, en_out);
+    
+    
     
      // fetch stage
     Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
-	ProgramCounter counter(Address, PCResult, Reset, Clk, Debug_Program_Counter);
+	ProgramCounter counter(Address, PCResult, Reset, NewClk, Debug_Program_Counter);
 	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
 	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
 	
 	// IF/ID
-	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, Clk, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
+	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, NewClk, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
 	
 	// Decode Stage
 	Controller control(InstructionIn, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp);
-	RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, Clk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
+	RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, NewClk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
 	SignExtension signExtend(IDinstructionOffset, IDSignExtendedOffset);
 	
 	
 	
 	// ID/EX
 	ID_EX_Reg IdExReg(IDRegPCAddResult, ReadData1, ReadData2, IDSignExtendedOffset, IDrs, IDrt, IDrd,
-	                   IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp,Clk,
+	                   IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp, NewClk,
 	                   EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrtReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
 	                   EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp);
 	                   
@@ -114,7 +124,7 @@ module Top( input Clk, Reset
     
     // EX/MEM
     EX_MEM_Reg ExMemReg(MultResult, EXBranchAddress, ALUResult, RegValB, RegValA, EXOffset, SelRd, EXregWrite, EXMemWrite, EXMemRead, EXbranchJump, ExMemToReg,
-                        MultBit, HiLoWrite, zeroFlag, Clk,
+                        MultBit, HiLoWrite, zeroFlag, NewClk,
                         MemMultResult, BranchAddress, MemALUResult, MemReadData2, MemReadData1, MemOffset, MemRd, MemregWrite, MemMemWrite, MemMemRead, PCSrc, MemMemToReg,
                         MemMultBit, MemHiLoWrite, MemZero);
                         
@@ -123,12 +133,12 @@ module Top( input Clk, Reset
    And regWriteAnd(MemZero, MemregWrite, MemRegWriteResult);
    
    multiplyUnit MU(MemMultResult, MulOut, HI, LO, MemHiLoWrite);
-   HiLoRegs hiloregs(HI, LO, MemHiLoWrite, Clk, Debug_HI, Debug_LO);
+   HiLoRegs hiloregs(HI, LO, MemHiLoWrite, NewClk, Debug_HI, Debug_LO);
    
    Mux32Bit2To1 MultMux(MemResult, MemALUResult, MulOut, MemMultBit); 
    
    // MEM/WB
-   MEM_WB_Reg MemWbReg(MemReadData, MemResult, MemRd, MemMemToReg, MemRegWriteResult, Clk,
+   MEM_WB_Reg MemWbReg(MemReadData, MemResult, MemRd, MemMemToReg, MemRegWriteResult, NewClk,
                        MemoryOut, ALUOut, WBrd, WBMemToReg, WBRegWrite);
                        
    // Write Back Stage
