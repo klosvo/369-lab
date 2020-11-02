@@ -19,24 +19,33 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, IFIDWrite, PCWrite, MulOp);
 
-module HazardDetection(IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, MuxSig, IFIDWrite, PCWrite);
-
-    input IDEXMemRead;
+    input [1:0] branch;
+    input IDEXMemRead, MulOp;
     input [4:0] IDEXrt, IFIDrs, IFIDrt;
     
-    output reg MuxSig, IFIDWrite, PCWrite;
+    reg stallagain;
     
-    always @( IDEXMemRead, IDEXrt, IFIDrs, IFIDrt ) begin
-        if (IDEXMemRead & ((IDEXrt == IFIDrs) | (IDEXrt == IFIDrt))) begin
-                MuxSig <= 0;
+    output reg IFIDFlush, IDEXFlush, IFIDWrite, PCWrite;
+    
+    always @( branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt ) begin
+        if ((IDEXMemRead & ((IDEXrt == IFIDrs) | (IDEXrt == IFIDrt))) | MulOp) begin
+                IDEXFlush <= 1;
                 IFIDWrite <= 0;
                 PCWrite <=0;
         end 
+        else if (~(branch == 0) | stallagain) begin
+            IFIDFlush <= 1;
+            IDEXFlush <= 1;
+            stallagain <= ~stallagain;
+        end
         else begin
-                MuxSig <= 1;
+                IFIDFlush <= 0;
+                IDEXFlush <= 0;
                 IFIDWrite <= 1;
                 PCWrite <= 1;
         end
+
     end          
 endmodule

@@ -20,19 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module BranchAnd(Branch, Zero, PCSrc);
-    input [1:0] Branch;
-    input Zero;
-    
-    output reg PCSrc;
-    
-    initial begin
-        PCSrc <= 0;
-    end
+module And(in1, in2, out);
+    input  in1, in2;
+    output reg out;
     
     always @ (*)begin
-        PCSrc =  Branch[0] & Zero;
+        out <= in1 & in2;
     end
-    
     
 endmodule
