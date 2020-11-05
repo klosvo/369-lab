@@ -30,7 +30,7 @@ module multiplyUnit( multResult, mulOut, HI_out, LO_out, regWrite);
     
     reg HI, LO;
     
-    always @ * begin
+    always @ (multResult, regWrite) begin
         if (regWrite) begin
             HI_out <= multResult[63:32];
             LO_out <= multResult[31:0];

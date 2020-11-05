@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+
 module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, IFIDWrite, PCWrite, MulOp);
 
     input [1:0] branch;
@@ -35,10 +36,10 @@ module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, I
                 IFIDWrite <= 0;
                 PCWrite <=0;
         end 
-        else if (~(branch == 0) | stallagain) begin
+        else if (~(branch == 0)) begin
             IFIDFlush <= 1;
             IDEXFlush <= 1;
-            stallagain <= ~stallagain;
+            //stallagain <= ~stallagain;
         end
         else begin
                 IFIDFlush <= 0;
@@ -46,6 +47,7 @@ module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, I
                 IFIDWrite <= 1;
                 PCWrite <= 1;
         end
-
+        
+        
     end          
 endmodule

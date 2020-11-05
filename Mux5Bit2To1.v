@@ -29,7 +29,7 @@ module Mux5Bit2To1(out, inA, inB, sel);
     input sel;
 
     /* Fill in the implementation here ... */ 
-    always @ (inA, inB, sel) begin
+    always @ (*) begin
        if (sel == 1)
             out <= inB;    
        else

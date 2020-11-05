@@ -75,7 +75,7 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
    end
 
    // Write procedure
-   always @(WriteData, RegWrite) begin
+   always @(posedge Clk) begin
       if ((RegWrite == 1) & ~(WriteRegister == 0))
          RegFile[WriteRegister] <= WriteData;
    end

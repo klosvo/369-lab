@@ -25,7 +25,7 @@ module Adder(InputA, InputB, AddResult);
 
     output reg [31:0] AddResult;
     
-    always @(InputA, InputB)
+    always @(*)
     begin
         AddResult = InputA + InputB;
     end

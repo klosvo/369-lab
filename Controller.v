@@ -59,15 +59,15 @@ module Controller(instruction, funct,
             endcase
             end
         6'b001000: begin // addi
-          regDst <= 1;
-          ALUSource <= 1;
-          MemToReg <= 1;
-          regWrite <= 1;
-          MemRead <= 0;
-          MemWrite <= 0;
-          BranchJump <= 0;
-          ALUOp <= 5'b000010; //  add Code
-          MulOp = 0;
+        regDst <= 1;
+        ALUSource <= 1;
+        MemToReg <= 1;
+        regWrite <= 1;
+        MemRead <= 0;
+        MemWrite <= 0;
+        BranchJump <= 0;
+        ALUOp <= 5'b000010; //  add Code
+        MulOp = 0;
         end
         6'b001001: begin // addiu
         regDst <= 1;
@@ -102,10 +102,6 @@ module Controller(instruction, funct,
         ALUOp <= 5'b01001; // 
         MulOp = 0;
         end
-        
-
-        
-        
         6'b100011: begin // lw
          MemDataType <= 2'b10;
         regDst <= 1;
@@ -304,9 +300,16 @@ module Controller(instruction, funct,
         end
         
             default: begin
-                controlOut <= 16'b0;
+                regDst = 0;
+                ALUSource = 0;
+                MemToReg = 0;
+                regWrite = 0;
+                MemRead = 0;
+                MemWrite = 0;
+                BranchJump = 0;
+                ALUOp = 0;
             end
-            
+     
     endcase
     
     end

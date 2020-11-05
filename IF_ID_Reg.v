@@ -32,13 +32,13 @@ module IF_ID_Reg(
     output reg [4:0] IDrs, IDrt, IDrd;   
     
     initial begin
-        PCAddResultOut <= 0;
-        InstructionOffset <= 0;
-        InstructionCode <= 0;
-        funct <= 0;
-        IDrs <= 0;
-        IDrt <= 0;
-        IDrd <= 0;
+        PCAddResultOut = 0;
+        InstructionOffset = 0;
+        InstructionCode = 0;
+        funct = 0;
+        IDrs = 0;
+        IDrt = 0;
+        IDrd = 0;
     end   
     
     always @ (posedge clk)begin
