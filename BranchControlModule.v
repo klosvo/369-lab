@@ -29,7 +29,6 @@ module BranchControlModule(Op, A, B, BGE_BLT, BranchAndJump, funct
     input [31:0]  A, B;
     output reg [1:0] BranchAndJump;
     
-    
     initial begin
         BranchAndJump = 0;
     end
@@ -43,18 +42,10 @@ module BranchControlModule(Op, A, B, BGE_BLT, BranchAndJump, funct
         3'b001: begin // beq
                 BranchAndJump[0] = ~(|(A ^ B));
                 BranchAndJump[1] = 0;
-//            if (A == B) begin
-//                BranchAndJump = 2'b01;
-//            end
-//            else BranchAndJump = 0;
         end
         3'b010: begin // bne
                 BranchAndJump[0] = (|(A ^ B));
                 BranchAndJump[1] = 0;
-//            if (A == B) begin
-//                BranchAndJump = 0;
-//            end
-//            else BranchAndJump = 2'b01;
         end
         3'b101: begin // bgtz
                 BranchAndJump[0] = ~A[31] & (|(A ^ 0));

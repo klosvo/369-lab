@@ -1,7 +1,5 @@
 `timescale 1ns / 1ps
 
-
-//INCOMPLETE
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
@@ -24,22 +22,22 @@ module EX_MEM_Reg(MultResultIn, BranchAddResultIn, ALUResultIn, MemDataIn, ReadD
                   output reg [1:0] BranchOut, dataTypeOut;
                   
       always @ (posedge clk) begin
-         MultResultOut = MultResultIn;
-         BranchAddResultOut = BranchAddResultIn;
-         ALUResultOut = ALUResultIn;
-         MemDataOut = MemDataIn;
-         rdRegOut = rdRegIn;
-         RegWriteOut = RegWriteIn;
-         MemWriteOut = MemWriteIn;
-         MemReadOut = MemReadIn;
-         MemToRegOut = MemToRegIn;
-         HiLoWriteOut = HiLoWriteIn;
-         MultBitOut = MultBitIn;
-         ZeroOut = ZeroIn;
-         BranchOut = BranchIn;   
-         dataTypeOut = dataTypeIn;
-         ReadData1Out = ReadData1In;
-         OffsetOut = OffsetIn;
+         MultResultOut <= MultResultIn;
+         BranchAddResultOut <= BranchAddResultIn;
+         ALUResultOut <= ALUResultIn;
+         MemDataOut <= MemDataIn;
+         rdRegOut <= rdRegIn;
+         RegWriteOut <= RegWriteIn;
+         MemWriteOut <= MemWriteIn;
+         MemReadOut <= MemReadIn;
+         MemToRegOut <= MemToRegIn;
+         HiLoWriteOut <= HiLoWriteIn;
+         MultBitOut <= MultBitIn;
+         ZeroOut <= ZeroIn;
+         BranchOut <= BranchIn;   
+         dataTypeOut <= dataTypeIn;
+         ReadData1Out <= ReadData1In;
+         OffsetOut <= OffsetIn;
       end
 
 endmodule

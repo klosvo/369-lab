@@ -20,24 +20,30 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Top_tb(
-
-    );
+module Top_tb( );
     reg clk;
     reg reset;
+    wire [6:0] out7;
+    wire [7:0] en_out;
     
-    Top top(clk, reset);
-    integer i;
-    
+    Top t1(clk, reset, out7, en_out);
 	
-	initial begin
-	reset = 0;
-        for (i = 0; i < 128; i = i+1) begin
-           #10 clk = 0;
-           #10 clk = 1;
-        end
+	always begin
+           clk = 0;
+           #100;
+           clk = 1;
+           #100;
 	end
 	
-    
-    
+	initial begin
+        reset <= 1;
+        @(posedge clk);
+        #5 reset <= 0;
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk); 
+	end
+	
 endmodule

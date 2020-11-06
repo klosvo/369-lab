@@ -1,7 +1,5 @@
 `timescale 1ns / 1ps
 
-
-//INCOMPLETE
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
@@ -12,7 +10,7 @@ module Shift_Left_2(ShiftIn, ShiftOut);
     output reg [31:0] ShiftOut;
     
     always @ (ShiftIn) begin
-    ShiftOut = ShiftIn << 2;
+        ShiftOut = ShiftIn << 2;
     end
 
 endmodule

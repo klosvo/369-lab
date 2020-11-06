@@ -42,23 +42,23 @@ module IF_ID_Reg(
     end   
     
     always @ (posedge clk)begin
-   if (flush) begin
-        PCAddResultOut = 0;
-        InstructionOffset <= 0;
-        InstructionCode <= 0;
-        funct = 0;
-        IDrs = 0;
-        IDrt = 0;
-        IDrd = 0;
-   end
-   else if (write) begin
-        PCAddResultOut = PCAddResultIn;
-        InstructionOffset <= InstructionIn[15:0];
-        InstructionCode <= InstructionIn[31:26];
-        funct = InstructionIn[5:0];
-        IDrs = InstructionIn[25:21];
-        IDrt = InstructionIn[20:16];
-        IDrd = InstructionIn[15:11];
+       if (flush) begin
+            PCAddResultOut <= 0;
+            InstructionOffset <= 0;
+            InstructionCode <= 0;
+            funct <= 0;
+            IDrs <= 0;
+            IDrt <= 0;
+            IDrd <= 0;
+       end
+       else if (write) begin
+            PCAddResultOut <= PCAddResultIn;
+            InstructionOffset <= InstructionIn[15:0];
+            InstructionCode <= InstructionIn[31:26];
+            funct <= InstructionIn[5:0];
+            IDrs <= InstructionIn[25:21];
+            IDrt <= InstructionIn[20:16];
+            IDrd <= InstructionIn[15:11];
         end
     end
 endmodule

@@ -34,19 +34,19 @@ module ProgramCounter(Address, PCWrite, PCResult, Reset, Clk, Debug);
 	output reg [31:0] PCResult;
 	
 	initial begin 
-	   PCResult <= 0;
+	   PCResult <= 32'h00000000;
 	end
 
-    /* Please fill in the implementation here... */
-    always @ (posedge Clk)
-    begin
-    if (PCWrite) begin
-    	if(Reset == 1)
-    		PCResult <= 32'h00000000;
-    	else begin
-    		PCResult <= Address;
-    		Debug <= PCResult;
-    	end
-    end
+    always @ (posedge Clk) begin
+            if(Reset == 1) begin
+                PCResult <= 32'h00000000;
+                Debug <= 32'h00000000;
+            end    
+            else begin
+                if (PCWrite) begin
+                PCResult <= Address;
+                Debug <= Address;
+                end
+            end
     end
 endmodule
