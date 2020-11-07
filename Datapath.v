@@ -31,27 +31,28 @@ module Datapath(Clk, Reset, PCResult, RegWriteData);
  
  // fetchStageWires
    wire [31:0] PCAddResult, Address, FetchedInstruction;
-   reg [31:0] PCAddAmount;
+   wire [31:0] PCAddAmount;
    
   // decode stage wires
    wire [31:0] IDRegPCAddResult, IDRegInstruction, ReadData1, ReadData2, IDSignExtendedOffset;
+   wire [27:0] ShiftedInst;
    wire [15:0] IDinstructionOffset;
    wire [5:0] InstructionIn, funct;
    wire [4:0] IDALUOp, IDrs, IDrt, IDrd;
    wire [2:0] IDbranchJump;
    wire [1:0] IDdataType;
-   wire IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IFIDWrite, PCWrite, FlushIFID, FlushIDEX, mulOp;
+   wire IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IFIDWrite, IDJump, PCWrite, FlushIFID, FlushIDEX, mulOp;
    
    // Execute Stage wires
    wire [63:0] MultResult;
-   wire [31:0] EXPCAddResult, EXReadData1, EXReadData2, EXOffset, ShiftedOffset, ALUInput, EXBranchAddress, ALUResult, RegValA, RegValB;
+   wire [31:0] EXPCAddResult, EXReadData1, EXReadData2, EXOffset, ShiftedOffset, ALUInput, EXBranchAddress, ALUResult, RegValA, RegValB, BranchMuxOut;
    wire [5:0] EXfunct;
    wire [4:0] EXALUOp, SEH;
    wire [4:0] EXrtReg, EXrsReg, EXrdReg, SelRd;
    wire [4:0] ALUcontrolWire;
    wire [2:0] EXBranchOp;
    wire [1:0] EXbranchJump, FwdCtrA, FwdCtrB, EXdataType;
-   wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag, HiLoWrite, MultBit;
+   wire EXregDst, EXALUSource, ExMemToReg, EXregWrite, EXMemRead, EXMemWrite, zeroFlag, HiLoWrite, MultBit, BranchANDSrc, Jump, Zero;
    
    //Memory Stage wires
     wire [63:0] MemMultResult;
@@ -67,64 +68,79 @@ module Datapath(Clk, Reset, PCResult, RegWriteData);
   wire WBRegWrite, WBMemToReg;
   
    
-   // initial and assignemnts
-    initial begin
-        PCAddAmount = 4;
-    end
+    // initial and assignemnts
+//    initial begin
+//        PCAddAmount = 4;
+//    end
     assign Debug_Write_Register = RegWriteData;
     
     
-     // fetch stage
-    Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
-	ProgramCounter counter(Address, PCWrite, PCResult, Reset, Clk, Debug_Program_Counter);
-	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
-	Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
+    // fetch stage
+	ProgramCounter counter(Address, PCWrite, PCAddAmount, PCResult, Reset, Clk, Debug_Program_Counter);
+	Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
 	
+	InstructionMemory instructionMemory(PCResult, FetchedInstruction);
+		
 	// IF/ID
 	IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, Clk, IFIDWrite, FlushIFID, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
 	
 	// Decode Stage
-	Controller control(InstructionIn, funct, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp, mulOp, IDdataType);
+	Shift_Left_2_28Bit JumpShift({2'b0, FetchedInstruction[25:0]}, ShiftedInst);
+	
+	Controller control(InstructionIn, funct, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDJump, IDbranchJump, IDALUOp, mulOp, IDdataType);
+	
+	 // hazard detection unit
+        HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, FetchedInstruction[25:21], FetchedInstruction[20:16], FlushIFID, FlushIDEX, IFIDWrite, PCWrite, mulOp);
+	
+	
 	RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, Clk, ReadData1, ReadData2); // hook up Rd, writeData RegWrite from WB stage
 	SignExtension signExtend(IDinstructionOffset, IDSignExtendedOffset);
 	
-	  // hazard detection unit
-     HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, IDrs, IDrt, FlushIFID, FlushIDEX, IFIDWrite, PCWrite, mulOp);
-	
-//	    input [1:0] branch;
-//    input IDEXMemRead, MulOp;
-//    input [4:0] IDEXrt, IFIDrs, IFIDrt;
-    
-//    reg stallagain;
-    
-//    output reg IFIDFlush, IDEXFlush, IFIDWrite, PCWrite;
-	
-	
-	// mux for control signals that depend on hazard detection unit
-    //Mux16Bit2to1 controlMux(MuxControlOut, 16'b0, ControlOut, MuxSig);
+//	  // hazard detection unit
+//     HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, IDrs, IDrt, FlushIFID, FlushIDEX, IFIDWrite, PCWrite, mulOp);
+
 
 	
 	// ID/EX
 	ID_EX_Reg IdExReg(IDRegPCAddResult, ReadData1, ReadData2, IDSignExtendedOffset, IDrs, IDrt, IDrd,
-	                    IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp, Clk, IDdataType,
+	                    IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDJump, funct, IDbranchJump, IDALUOp, Clk, IDdataType,
 	                   EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrtReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
-	                    EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp, EXdataType, FlushIDEX);
+	                    EXMemRead, EXMemWrite, Jump, EXfunct, EXBranchOp, EXALUOp, EXdataType, FlushIDEX);
 	                   
 	                   assign SEH = EXOffset[10:6];
 	                   
 	                   //forwarding Muxes
 	                   Mux32Bit4To1 forwardMuxA(RegValA, EXReadData1, MemALUResult, RegWriteData, 0, FwdCtrA);
 	                   Mux32Bit4To1 forwardMuxB(RegValB, EXReadData2, MemALUResult, RegWriteData, 0, FwdCtrB);
-	                   
+	                   //Mux32Bit4To1(out, inA, inB, inC, inD, sel);
 	// Execution Stage
     Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
-    Mux32Bit2To1 ALUsrcMux (ALUInput, EXReadData2, EXOffset, EXALUSource);
+    Mux32Bit2To1 ALUsrcMux (ALUInput, RegValB, EXOffset, EXALUSource);
+    //Mux32Bit2To1 ALUsrcMux (ALUInput, EXReadData2, EXOffset, EXALUSource);
     
+    //Mux32Bit2To1(out, inA, inB, sel);
     Mux5Bit2To1 RegDstMux (SelRd, EXrdReg, EXrtReg, EXregDst);
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);
+    //Adder(InputA, InputB, AddResult);
+        
+    
     ALUControl ALUcontroller(EXALUOp, EXfunct, SEH, ALUcontrolWire, HiLoWrite, MultBit); //EXALUOp, EXOffset, ALUcontrol
-    ALU32Bit ALU(ALUcontrolWire, RegValA, ALUInput, HiLoWrite, EXrsReg, SEH, ALUResult, zeroFlag, MultResult, Debug_HI, Debug_LO);
-    BranchControlModule BranchAndJumpController(EXBranchOp, RegValA, RegValB, EXrsReg, EXbranchJump, EXfunct);
+    ALU32Bit ALU(ALUcontrolWire, RegValA, ALUInput, HiLoWrite, EXrsReg,  EXOffset[10:6], ALUResult, Zero, zeroFlag, MultResult, Debug_HI, Debug_LO);
+ 
+    //Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
+        // Mux32Bit4To1(out, inA, inB, inC, inD, sel);
+        
+    And BranchAndZero(Zero, Jump, BranchANDSrc);    
+    // First branch Mux for Jump and Branch, w/ select signal Zero & Branch    
+    Mux32Bit2To1 branchAddMUX(BranchMuxOut, EXPCAddResult, EXBranchAddress, BranchANDSrc);
+    
+    // Second branch Mux w/ Jump as select signal
+    Mux32Bit2To1 jumpMUX2 (Address, BranchMuxOut, {EXPCAddResult[31:28], ShiftedInst}, Jump);
+    
+    
+    
+    //ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, MultResult, HI_in, LO_in);
+    //BranchControlModule BranchAndJumpController(EXBranchOp, RegValA, RegValB, EXrsReg, EXbranchJump, EXfunct);
     
         // forwarding Unit
         ForwardingUnit forwarding(WBRegWrite, WBrd, MemregWrite, MemRd, EXrsReg, EXrtReg, FwdCtrA, FwdCtrB);

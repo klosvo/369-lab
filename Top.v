@@ -26,17 +26,12 @@ module Top(Clk, Reset, out7, en_out);
     input Clk, Reset;
     output [6:0] out7;
     output [7:0] en_out;
-    
-    //debug
-//    (* mark_debug = "true" *) wire [31:0] Debug_Program_Counter, Debug_HI, Debug_LO, Debug_Write_Register;
 
    wire [31:0] ProgramCounter, WriteData;
    
    // seven segement wires
    wire NewClk;
-    
-//    assign Debug_Write_Register = RegWriteData;
-
+     
      ClkDiv clock_divider (Clk, Reset, NewClk);
      
      // Datapath 
@@ -44,5 +39,5 @@ module Top(Clk, Reset, out7, en_out);
      
      // sevenSegment Display
      Two4DigitDisplay two_4_digit_display(Clk, ProgramCounter[15:0], WriteData[15:0], out7, en_out);
-         
+ 
 endmodule

@@ -19,12 +19,11 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module Controller(instruction, funct, 
-                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp, MulOp, MemDataType);
+                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, Jump, BranchJump, ALUOp, MulOp, MemDataType);
     input [5:0] instruction, funct;
     output reg [1:0] MemDataType;
-    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp;
+    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp, Jump;
     output reg [2:0] BranchJump;
     output reg [4:0] ALUOp;
     
@@ -37,22 +36,23 @@ module Controller(instruction, funct,
         regWrite <= 0;
         MemRead <= 0;
         MemWrite <= 0;
+        Jump <= 0;
         BranchJump <= 3'b0;
         ALUOp <= 5'b0;
     end
     
-    always @ (instruction, funct) begin
-//        MulOp <= 0;
-//        MemDataType <= 0;
-//        regDst <= 0;
-//        ALUSource <= 0;
-//        MemToReg <= 0;
-//        regWrite <= 0;
-//        MemRead <= 0;
-//        MemWrite <= 0;
-//        BranchJump <= 3'b0;
-//        ALUOp <= 5'b0;
-    
+    always @ (*) begin
+        MulOp <= 0;
+        MemDataType <= 0;
+        regDst <= 0;
+        ALUSource <= 0;
+        MemToReg <= 0;
+        regWrite <= 0;
+        MemRead <= 0;
+        MemWrite <= 0;
+        Jump <= 0;
+        BranchJump <= 3'b0;
+        ALUOp <= 5'b0;
     
         case (instruction)
             6'b000000: begin // r-type
@@ -192,68 +192,41 @@ module Controller(instruction, funct,
                 ALUOp <= 5'b10100; // lui Code
                 MulOp <= 0;
             end
-            6'b000001: begin //
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+            6'b000001: begin // bltz/ bgez
+                Jump <= 1;
                 BranchJump <= 3'b100;
-                ALUOp <= 0; // todo: Change to sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // todo: Change to sub Code
             end
             6'b000100: begin // beq
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b001;
-                ALUOp <= 2'b01; // sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // sub Code
             end
             6'b000101: begin // bne
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b010;
-                ALUOp <= 2'b01; // sub Code
+                ALUOp <= 5'b00110; // sub Code
                 MulOp <= 0;
             end
             6'b000111: begin // bgtz
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b101;
-                ALUOp <= 0; // todo: Change to sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // todo: Change to sub Code
             end
             6'b000110: begin // blez
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b110;
-                ALUOp <= 0; // todo: Change to sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // todo: Change to sub Code
             end
             6'b000010: begin // j // reqires datapath modification
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b011;
-                ALUOp <= 0; // todo: Change to sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // todo: Change to sub Code
             end
             6'b000011: begin // jal
-                ALUSource <= 0;
-                regWrite <= 0;
-                MemRead <= 0;
-                MemWrite <= 0;
+                Jump <= 1;
                 BranchJump <= 3'b011;
-                ALUOp <= 0; // todo: Change to sub Code
-                MulOp <= 0;
+                ALUOp <= 5'b00110; // todo: Change to sub Code
             end
             6'b001100: begin // andi
                 regDst <= 1;

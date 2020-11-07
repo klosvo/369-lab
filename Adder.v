@@ -27,7 +27,7 @@ module Adder(InputA, InputB, AddResult);
     
     always @(InputA, InputB)
     begin
-        AddResult = InputA + InputB;
+        AddResult <= InputA + InputB;
     end
     
 endmodule

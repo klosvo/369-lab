@@ -29,13 +29,23 @@ module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, I
     
     output reg IFIDFlush, IDEXFlush, IFIDWrite, PCWrite;
     
-    always @( branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, MulOp, stallagain ) begin
+    initial begin
+        stallagain <= 0;
+        IFIDFlush <= 0;
+        IDEXFlush <= 0;
+        IFIDWrite <= 1;
+        PCWrite <= 1;
+    end
+    
+    always @(*) begin
         if ((IDEXMemRead & ((IDEXrt == IFIDrs) | (IDEXrt == IFIDrt))) | MulOp) begin
+                IFIDFlush <= 0;
                 IDEXFlush <= 1;
                 IFIDWrite <= 0;
-                PCWrite <=0;
+                PCWrite <= 0;
         end 
         else if (~(branch == 0) | stallagain) begin
+            IFIDWrite <= 1;
             IFIDFlush <= 1;
             IDEXFlush <= 1;
             stallagain <= ~stallagain;

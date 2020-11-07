@@ -4,7 +4,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
+module ALUControl(ALUOp, funct, SEH, ALUCtl, HiLoWrite, MultBit
 );
     
 	input [4:0] ALUOp; 	// Control bits for ALU operation
@@ -12,11 +12,27 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
 	input [4:0] SEH;
 	output reg [4:0] ALUCtl;
 	output reg HiLoWrite, MultBit;
+	
+	initial begin
+	   ALUCtl <= 5'b00000; // andi
+	end
 
     always @ (ALUOp, funct) begin 
             HiLoWrite <= 0;
             MultBit <= 0;
             case (ALUOp)
+            5'b00110:    // jump and branch
+            begin
+                case(funct)
+                    6'b000001: ALUCtl <= 5'b10111; /// bgez and bltz
+                    6'b000100: ALUCtl <= 5'b00110; // sub  // beq
+                    6'b000101: ALUCtl <= 5'b10101;// bne
+                    6'b000111: ALUCtl <= 5'b11000; // bgtz
+                    6'b000110: ALUCtl <=5'b11010; // blez
+                    6'b000010: ALUCtl <= 5'b11011; // j // reqires datapath modification
+                    6'b000011: ALUCtl <= 5'b11100; // jal
+                endcase
+            end  
             
             5'b00010:    // lw, sw, lb, sb, lh, sh
                 begin

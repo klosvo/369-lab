@@ -28,26 +28,26 @@ module ForwardingUnit(
     output reg[1:0] ControlA, ControlB;
     
     initial begin 
-        ControlA = 0;
-        ControlB = 0;
+        ControlA <= 0;
+        ControlB <= 0;
     end
     
     always @ * begin
         if (MemRegWrite & ~(Memrd == 0) & (Memrd == EXrs)) begin
-        ControlA = 1;
+        ControlA <= 1;
         end
         else if (WBRegWrite & ~(WBrd == 0) & (WBrd == EXrs))  begin
-        ControlA = 2;
+        ControlA <= 2;
         end
-        else ControlA = 0;
+        else ControlA <= 0;
         
         if (MemRegWrite & ~(Memrd == 0) & (Memrd == EXrt)) begin
-        ControlB = 1;
+        ControlB <= 1;
         end
         else if (WBRegWrite & ~(WBrd == 0) & (WBrd == EXrt))  begin
-        ControlB = 2;
+        ControlB <= 2;
         end
-        else ControlB = 0;
+        else ControlB <= 0;
         
         
     end
