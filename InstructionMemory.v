@@ -49,75 +49,8 @@ module InstructionMemory(Address, Instruction);
     
          initial begin                   //need to initalize this for the code!!!
 
-<<<<<<< Updated upstream
-memory[0] <= 32'b00100000000010000000000000000100;	//	main:		addi	$t0, $zero, 4
-memory[1] <= 32'b00100000000010011111111111111011;	//			addi	$t1, $zero, -5
-memory[2] <= 32'b00100001000010001111111111111111;	//	loop:		addi	$t0, $t0, -1
-memory[3] <= 32'b00011101000000001111111111111110;	//			bgtz	$t0, loop
-memory[4] <= 32'b00100001001010010000000000000001;	//	loop2:		addi	$t1, $t1, 1
-memory[5] <= 32'b00000101001000001111111111111110;	//			bltz	$t1, loop2
-memory[6] <= 32'b00100000000010100000000000000000;	//			addi	$t2, $zero, 0
-memory[7] <= 32'b00010001010000000000000000000010;	//	return1:	beq	$t2, $zero, CheckJump
-memory[8] <= 32'b00010101010000000000000000000011;	//			bne	$t2, $zero, CheckJR
-memory[9] <= 32'b00000011111000000000000000001000;	//			jr	$ra
-memory[10] <= 32'b00100000000010100000000000000001;	//	CheckJump:	addi	$t2, $zero, 1
-memory[11] <= 32'b00000000000000000000000000000000;	//			nop
-memory[12] <= 32'b00100000000010100000000000100000;	//	CheckJR:	addi	$t2, $zero, 32
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-        
-    
-
-        
-        
-                
-        
-=======
         $readmemh ("Instruction_memory.txt", memory);
   
->>>>>>> Stashed changes
         /*
             //  TASK 3
             memory[0] = 32'h34040000;	//	main:		ori	$a0, $zero, 0

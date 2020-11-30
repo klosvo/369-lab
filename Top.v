@@ -78,11 +78,7 @@ module Top( input Clk, Reset,
     // sevenSegment Display
      ClkDiv clock_divider (Clk, Reset, NewClk);
      Two4DigitDisplay two_4_digit_display(Clk, Debug_Program_Counter[15:0], Debug_Write_Register[15:0], out7, en_out);
-<<<<<<< Updated upstream
-     assign NewClk = Clk;
-=======
      //assign NewClk = Clk;
->>>>>>> Stashed changes
      
    
         
@@ -93,25 +89,13 @@ module Top( input Clk, Reset,
     Adder PCAdder(PCResult, PCAddAmount, PCAddResult);
   ProgramCounter counter(Address, PCWrite, PCResult, Reset, NewClk, Debug_Program_Counter);
   InstructionMemory instructionMemory(PCResult, FetchedInstruction);
-<<<<<<< Updated upstream
-  Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, MemOffset, MemReadData1, PCSrc); // hook up branch Control
-=======
   Mux32Bit4To1 PCSrcMux(Address, PCAddResult, BranchAddress, JumpAddressShifted, MemReadData1, PCSrc); 
   Shift_Left_2 addressShifter(MemOffset, JumpAddressShifted);
->>>>>>> Stashed changes
   
   // IF/ID
   IF_ID_Reg IfIdReg(PCAddResult, FetchedInstruction, NewClk, IFIDWrite, FlushIFID, IDRegPCAddResult, IDinstructionOffset, InstructionIn, funct, IDrs, IDrt, IDrd);
   
   // Decode Stage
-<<<<<<< Updated upstream
-  Controller control(InstructionIn, funct, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp, mulOp, IDdataType);
-  RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, NewClk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
-  SignExtension signExtend(IDinstructionOffset, IDSignExtendedOffset);
-  
-    // hazard detection unit
-     HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, IDrs, IDrt, FlushIFID, FlushIDEX, IFIDWrite, PCWrite, mulOp);
-=======
   Controller control(InstructionIn, funct, IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, IDbranchJump, IDALUOp, mulOp, ZeroExtendBit, IDdataType);
   RegisterFile registers(IDrs, IDrt, WBrd, RegWriteData, WBRegWrite, NewClk, ReadData1, ReadData2, debug_reg16); // hook up Rd, writeData RegWrite from WB stage
   SignExtension signExtend(IDinstructionOffset, IDSignExtended);
@@ -121,7 +105,6 @@ module Top( input Clk, Reset,
   
     // hazard detection unit
      HazardDetection hazard(PCSrc, EXMemRead, EXrtReg, IDrs, IDrt, FlushIFID, FlushIDEX, FlushEXMEM, IFIDWrite, PCWrite, mulOp);
->>>>>>> Stashed changes
   
   // mux for control signals that depend on hazard detection unit
     //Mux16Bit2to1 controlMux(MuxControlOut, 16'b0, ControlOut, MuxSig);
@@ -143,36 +126,12 @@ module Top( input Clk, Reset,
                      
   // Execution Stage
 
-<<<<<<< Updated upstream
-  
-  // ID/EX
-  ID_EX_Reg IdExReg(IDRegPCAddResult, ReadData1, ReadData2, IDSignExtendedOffset, IDrs, IDrt, IDrd,
-                      IDregDst, IDALUSource, IDMemToReg, IDregWrite, IDMemRead, IDMemWrite, funct, IDbranchJump, IDALUOp, NewClk, IDdataType,
-                     EXPCAddResult, EXReadData1, EXReadData2, EXOffset, EXrsReg, EXrtReg, EXrdReg, EXregDst, EXALUSource, ExMemToReg, EXregWrite,
-                      EXMemRead, EXMemWrite, EXfunct, EXBranchOp, EXALUOp, EXdataType, FlushIDEX);
-                     
-                     assign SEH = EXOffset[10:6];
-                     
-//                     //forwarding Muxes
-//                     Mux32Bit4To1 forwardMuxA(RegValA, EXReadData1, MemALUResult, RegWriteData, 0, FwdCtrA);
-//                     Mux32Bit4To1 forwardMuxB(RegValB, EXReadData2, MemALUResult, RegWriteData, 0, FwdCtrB);
-                     
-  // Execution Stage
-
-    Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
-    Mux32Bit2To1 ALUsrcMux (ALUInput, EXReadData2, EXOffset, EXALUSource);
-    
-                     //forwarding Muxes
-                     Mux32Bit4To1 forwardMuxA(RegValA, EXReadData1, MemALUResult, RegWriteData, 0, FwdCtrA);
-                     Mux32Bit4To1 forwardMuxB(RegValB, ALUInput, MemALUResult, RegWriteData, 0, FwdCtrB);
-=======
     Shift_Left_2 ShiftLeft2 (EXOffset, ShiftedOffset);
     Mux32Bit2To1 ALUsrcMux (ALUInput, RegValB, EXOffset, EXALUSource);
     
                      //forwarding Muxes
                      Mux32Bit4To1 forwardMuxA(RegValA, EXReadData1, MemALUResult, RegWriteData, 0, FwdCtrA);
                      Mux32Bit4To1 forwardMuxB(RegValB, EXReadData2, MemALUResult, RegWriteData, 0, FwdCtrB);
->>>>>>> Stashed changes
     
     Mux5Bit2To1 RegDstMux (SelRd, EXrdReg, EXrtReg, EXregDst);
     Adder BranchAdder (EXPCAddResult, ShiftedOffset, EXBranchAddress);

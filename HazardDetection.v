@@ -19,11 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-<<<<<<< Updated upstream
-module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, IFIDWrite, PCWrite, MulOp);
-=======
 module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, EXMEMFlush, IFIDWrite, PCWrite, MulOp);
->>>>>>> Stashed changes
 
     input [1:0] branch;
     input IDEXMemRead, MulOp;
@@ -50,14 +46,10 @@ module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, I
                 PCWrite <=0;
                 mulStallCounter <= 1;
         end 
-        else if (~(branch == 0) | stallagain) begin
+        else if (~(branch == 0)) begin
             IFIDFlush <= 1;
             IDEXFlush <= 1;
-<<<<<<< Updated upstream
-            stallagain <= ~stallagain;
-=======
             EXMEMFlush <= 1;
->>>>>>> Stashed changes
         end
         else begin
                 IFIDFlush <= 0;

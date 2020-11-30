@@ -69,10 +69,7 @@ module Controller(instruction, funct,
           MemRead <= 0;
           MemWrite <= 0;
           BranchJump <= 0;
-<<<<<<< Updated upstream
-=======
           zeroExtend = 0;
->>>>>>> Stashed changes
           ALUOp <= 5'b000010; //  add Code
           MulOp = 0;
         end
