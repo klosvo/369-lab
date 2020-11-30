@@ -49,6 +49,7 @@ module InstructionMemory(Address, Instruction);
     
          initial begin                   //need to initalize this for the code!!!
 
+<<<<<<< Updated upstream
 memory[0] <= 32'b00100000000010000000000000000100;	//	main:		addi	$t0, $zero, 4
 memory[1] <= 32'b00100000000010011111111111111011;	//			addi	$t1, $zero, -5
 memory[2] <= 32'b00100001000010001111111111111111;	//	loop:		addi	$t0, $t0, -1
@@ -113,6 +114,10 @@ memory[12] <= 32'b00100000000010100000000000100000;	//	CheckJR:	addi	$t2, $zero,
         
                 
         
+=======
+        $readmemh ("Instruction_memory.txt", memory);
+  
+>>>>>>> Stashed changes
         /*
             //  TASK 3
             memory[0] = 32'h34040000;	//	main:		ori	$a0, $zero, 0

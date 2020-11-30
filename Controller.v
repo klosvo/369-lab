@@ -21,15 +21,16 @@
 
 
 module Controller(instruction, funct, 
-                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp, MulOp, MemDataType);
+                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp, MulOp, zeroExtend, MemDataType);
     input [5:0] instruction, funct;
     output reg [1:0] MemDataType;
-    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp;
+    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp, zeroExtend;
     output reg [2:0] BranchJump;
     output reg [4:0] ALUOp;
     
     initial begin
         MulOp = 0;
+        zeroExtend = 0;
         MemDataType = 0;
         regDst = 0;
         ALUSource = 0;
@@ -49,9 +50,11 @@ module Controller(instruction, funct,
             MemToReg = 1'b1;
             regWrite = 1'b1;
             MemRead = 1'b0;
+            zeroExtend = 0;
             MemWrite = 1'b0;
             BranchJump = 3'b000;
             ALUOp = 5'b000000;
+            
             case (funct) 
                 6'b011000: MulOp = 1;
                 6'b011001: MulOp = 1;
@@ -66,6 +69,10 @@ module Controller(instruction, funct,
           MemRead <= 0;
           MemWrite <= 0;
           BranchJump <= 0;
+<<<<<<< Updated upstream
+=======
+          zeroExtend = 0;
+>>>>>>> Stashed changes
           ALUOp <= 5'b000010; //  add Code
           MulOp = 0;
         end
@@ -77,6 +84,7 @@ module Controller(instruction, funct,
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 0;
+        zeroExtend = 1;
         ALUOp <= 5'b00111; // todo: Change to addu Code
         MulOp = 0;
         end
@@ -115,6 +123,7 @@ module Controller(instruction, funct,
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -125,6 +134,7 @@ module Controller(instruction, funct,
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -137,6 +147,7 @@ module Controller(instruction, funct,
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -149,6 +160,7 @@ module Controller(instruction, funct,
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -159,6 +171,7 @@ module Controller(instruction, funct,
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -169,6 +182,7 @@ module Controller(instruction, funct,
         MemRead <= 0;
         MemWrite <= 1;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -181,6 +195,7 @@ module Controller(instruction, funct,
         MemRead <= 1;
         MemWrite <= 0;
         BranchJump <= 0;
+        zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
         end
@@ -190,7 +205,8 @@ module Controller(instruction, funct,
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 3'b100;
-        ALUOp <= 0; // todo: Change to sub Code
+        ALUOp <= 0; 
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000100: begin // beq
@@ -200,6 +216,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b001;
         ALUOp <= 2'b01; // sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000101: begin // bne
@@ -209,6 +226,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b010;
         ALUOp <= 2'b01; // sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000111: begin // bgtz
@@ -218,6 +236,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b101;
         ALUOp <= 0; // todo: Change to sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000110: begin // blez
@@ -227,6 +246,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b110;
         ALUOp <= 0; // todo: Change to sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000010: begin // j // reqires datapath modification
@@ -236,6 +256,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b011;
         ALUOp <= 0; // todo: Change to sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b000011: begin // jal
@@ -245,6 +266,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 3'b011;
         ALUOp <= 0; // todo: Change to sub Code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b001100: begin // andi
@@ -256,6 +278,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 0;
         ALUOp <= 5'b00001; // change to and code
+        zeroExtend = 1;
         MulOp = 0;
         end
         6'b001101: begin // ori
@@ -267,6 +290,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 0;
         ALUOp <= 5'b00011; // change to or code
+        zeroExtend = 1;
         MulOp = 0;
         end
         6'b001110: begin // xori
@@ -278,6 +302,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 0;
         ALUOp <= 5'b00100; // change to xor code
+        zeroExtend = 1;
         MulOp = 0;
         end
          6'b001010: begin // slti
@@ -289,6 +314,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 0;
         ALUOp <= 5'b00101; // change to slt code
+        zeroExtend = 0;
         MulOp = 0;
         end
         6'b001011: begin // sltiu
@@ -300,6 +326,7 @@ module Controller(instruction, funct,
         MemWrite <= 0;
         BranchJump <= 0;
         ALUOp <= 5'b01011; // change to sltu code
+        zeroExtend = 1;
         MulOp = 0;
         end
             

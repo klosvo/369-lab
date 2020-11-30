@@ -21,11 +21,12 @@
 
 
 module ForwardingUnit(
-        WBRegWrite, WBrd, MemRegWrite, Memrd, EXrs, EXrt, ControlA, ControlB
+        WBRegWrite, WBrd, MemRegWrite, Memrd, EXrs, EXrt, IDrs, IDrt, IDimmBit, EXimmBit, IDMemWrite, EXMemWrite, ControlA, ControlB, ControlC, ControlD
     );
-    input WBRegWrite, MemRegWrite;
-    input [4:0] WBrd, Memrd, EXrs, EXrt;
+    input WBRegWrite, MemRegWrite, IDimmBit, EXimmBit, IDMemWrite, EXMemWrite;
+    input [4:0] WBrd, Memrd, EXrs, EXrt, IDrs, IDrt;
     output reg[1:0] ControlA, ControlB;
+    output reg ControlC, ControlD;
     
     initial begin 
         ControlA = 0;
@@ -33,6 +34,7 @@ module ForwardingUnit(
     end
     
     always @ * begin
+        //forwarding from Mem and WB to EX
         if (MemRegWrite & ~(Memrd == 0) & (Memrd == EXrs)) begin
         ControlA = 1;
         end
@@ -41,14 +43,25 @@ module ForwardingUnit(
         end
         else ControlA = 0;
         
-        if (MemRegWrite & ~(Memrd == 0) & (Memrd == EXrt)) begin
+        if (MemRegWrite & (~EXimmBit | EXMemWrite) & ~(Memrd == 0) & (Memrd == EXrt)) begin
         ControlB = 1;
         end
-        else if (WBRegWrite & ~(WBrd == 0) & (WBrd == EXrt))  begin
+        else if (WBRegWrite & (~EXimmBit | EXMemWrite) & ~(WBrd == 0) & (WBrd == EXrt))  begin
         ControlB = 2;
         end
         else ControlB = 0;
         
+        // forwarding from WB to ID
+        if (WBRegWrite & ~(WBrd == 0) & (WBrd == IDrs)) begin
+        ControlC <= 1;
+        end
+        else ControlC <= 0;
+        if (WBRegWrite & (~IDimmBit | IDMemWrite) & ~(WBrd == 0) & (WBrd == IDrt)) begin
+            ControlD <= 1;
+        end
+        else ControlD <= 0;
+        
+       
         
     end
     

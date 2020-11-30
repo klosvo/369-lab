@@ -45,17 +45,28 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
 
     output reg[31:0] ReadData; // Contents of memory location at Address
 
+<<<<<<< Updated upstream
     reg [31:0] memory [0:1023];
+=======
+    reg [31:0] memory [0:10000];
+>>>>>>> Stashed changes
   
     integer i;
     
     initial begin
+<<<<<<< Updated upstream
        for(i=0; i<1024; i = i+1) begin
           memory[i] <= 32'h0;
        end
        memory[0] <= 32'h12345678;
        memory[1] <= 32'hc0c0b0b0;
        memory[5] <= 32'hff00000a;
+=======
+//        for (i = 0; i < 10000; i = i + 1) begin
+//            memory[i] <= 0;
+//        end
+        $readmemh ("data_memory.txt", memory);
+>>>>>>> Stashed changes
      end
 
     always @(*) begin
@@ -63,10 +74,30 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
 //            ReadData <= memory[Address[11:2]];
             case (dataType)
                 2'b00: begin // byte
+<<<<<<< Updated upstream
                     ReadData <= {24'b0, memory[Address[11:2]][7:0]};
                 end
                 2'b01: begin // halfword
                     ReadData <= {16'b0, memory[Address[11:2]][15:0]};
+=======
+                    case(Address[1:0])  // which byte is indicated?
+                        // least significant byte
+                        2'b00:   ReadData <= {24'b0, memory[Address[11:2]][7:0]};
+                        // second least significant byte
+                        2'b01:   ReadData <= ReadData <= {24'b0, memory[Address[11:2]][15:8]};
+                        // second most significant byte
+                        2'b10: ReadData <= ReadData <= {24'b0, memory[Address[11:2]][23:16]}; 
+                        2'b11: ReadData <= ReadData <= {24'b0, memory[Address[11:2]][31:24]};
+                    endcase
+                end
+                2'b01: begin // halfword
+                    case(Address[0])    // which halfword is indicated?
+                        // least significant halfword
+                        1'b0:  ReadData <= {16'b0, memory[Address[11:2]][15:0]}; 
+                        // most significant halfword
+                        1'b1:  ReadData <= {16'b0, memory[Address[11:2]][31:16]}; 
+                    endcase
+>>>>>>> Stashed changes
                 end
                 2'b10: begin // word
                     ReadData <= memory[Address[11:2]];
@@ -82,7 +113,7 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
     always @(Address, MemWrite) begin
         if(MemWrite == 1) begin
             case (dataType)
-                2'b00: begin // byte
+                2'b00: begin // byte (8 bits)
                     case(Address[1:0])  // which byte is indicated?
                         // least significant byte
                         2'b00: memory[Address >> 2][7:0] <= WriteData[7:0];
@@ -94,15 +125,23 @@ module DataMemory(Address, WriteData, MemWrite, MemRead, dataType, ReadData);
                         2'b11: memory[Address >> 2][31:24] <= WriteData[31:24];
                     endcase
                 end
+<<<<<<< Updated upstream
                 2'b01: begin // half word
+=======
+                2'b01: begin // half word (16 bits)
+>>>>>>> Stashed changes
                     case(Address[0])    // which halfword is indicated?
                         // least significant halfword
                         1'b0: memory[Address >> 2][15:0] <= WriteData[15:0];
                         // most significant halfword
+<<<<<<< Updated upstream
                         1'b1: memory[Address >> 2][31:16] <= WriteData[31:16];
+=======
+                        1'b1: memory[Address >> 2][31:16] <= WriteData[15:0];
+>>>>>>> Stashed changes
                     endcase
                 end
-                2'b10: begin // word (16 bits)
+                2'b10: begin // word (32 bits)
                     memory[Address >> 2] <= WriteData;
                 end
                 default: begin

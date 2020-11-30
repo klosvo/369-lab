@@ -97,14 +97,25 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 			5'b00100: begin   // srl and rotr
 			case (rs)
 			     5'b00001: ALUResult <= (B >> LogicalOffset) | (B << (32 - LogicalOffset));
-			     5'b00000: ALUResult <= B >> LogicalOffset;
+			     5'b00000:
+			     begin
+			     if (B[31]) begin
+			     ALUResult <= ~(~B >> LogicalOffset);
+			     end 
+			     else ALUResult <= B >> LogicalOffset;
+			     end
 			endcase 		
             end
 			
 			5'b11110: begin   // srlv and rotrv
 			case (LogicalOffset)
 			     5'b00001: ALUResult <=  B >> A | B << (32 - A);
-			     5'b00000: ALUResult <= B >> A;
+			     5'b00000: begin
+			     if (B[31]) begin
+			     ALUResult <= ~(~B >> A);
+			     end 
+			     else ALUResult <= B >> A;
+			     end
 			endcase 		
             end
 			// MULTIPLICATION -> MUL, MULT, MULTU		

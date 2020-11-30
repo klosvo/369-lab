@@ -36,7 +36,7 @@ module BranchControlModule(Op, A, B, BGE_BLT, BranchAndJump, funct
     
     always @ * begin
     case (Op)
-        3'b100: begin // bgez skipped for now
+        3'b100: begin // bgez -- bltz
                 BranchAndJump[0] = A[31] ^ BGE_BLT[0];
                 BranchAndJump[1] = 0;
         end

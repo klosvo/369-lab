@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 10/17/2020 12:20:23 PM
+// Create Date: 11/29/2020 01:32:21 PM
 // Design Name: 
-// Module Name: Top_tb
+// Module Name: zeroExtension
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,24 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Top_tb(
+module zeroExtension(in, out);
 
-    );
-    reg clk;
-    reg reset;
+    /* A 16-Bit input word */
+    input [15:0] in;
     
-    Top top(clk, reset);
-    integer i;
+    /* A 32-Bit output word */
+    output [31:0] out;
     
-	
-	initial begin
-	reset = 0;
-        for (i = 0; i < 256; i = i+1) begin
-           #10 clk = 0;
-           #10 clk = 1;
-        end
-	end
-	
-    
-    
+    /* Fill in the implementation here ... */
+    assign out =  { {16{0}}, in };
+
 endmodule
