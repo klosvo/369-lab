@@ -140,7 +140,7 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 			//SLTIU, SLTU 
 			5'b11001: ALUResult <= ($unsigned(A) < $unsigned(B)) ? 1 : 0;
 			
-//			5'b11100: ;
+			5'b11100: ALUResult <= A - 4; // jal
 
 
 			// NOR 		 

@@ -22,6 +22,7 @@ module ALUControl(ALUOp, funct, SEH, ALUCtl,  HiLoWrite, MultBit
                 begin
                     ALUCtl <= 5'b00010;  // add
                 end  
+            5'b10000: ALUCtl <= 5'b11100; // jal
             5'b00001: ALUCtl <= 5'b00000; // andi
             5'b00011: ALUCtl <= 5'b00001; // ori
             5'b00100: ALUCtl <= 5'b01001; // xori

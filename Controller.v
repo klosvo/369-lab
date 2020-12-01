@@ -21,10 +21,10 @@
 
 
 module Controller(instruction, funct, 
-                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp, MulOp, zeroExtend, MemDataType);
+                  regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, BranchJump, ALUOp, MulOp, zeroExtend, MemDataType, jalBit);
     input [5:0] instruction, funct;
     output reg [1:0] MemDataType;
-    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp, zeroExtend;
+    output reg regDst, ALUSource, MemToReg, regWrite, MemRead, MemWrite, MulOp, zeroExtend, jalBit;
     output reg [2:0] BranchJump;
     output reg [4:0] ALUOp;
     
@@ -40,6 +40,7 @@ module Controller(instruction, funct,
         MemWrite = 0;
         BranchJump = 0;
         ALUOp = 0;
+        jalBit = 0;
     end
     
     always @ (instruction) begin
@@ -54,7 +55,7 @@ module Controller(instruction, funct,
             MemWrite = 1'b0;
             BranchJump = 3'b000;
             ALUOp = 5'b000000;
-            
+            jalBit = 0;
             case (funct) 
                 6'b011000: MulOp = 1;
                 6'b011001: MulOp = 1;
@@ -72,6 +73,7 @@ module Controller(instruction, funct,
           zeroExtend = 0;
           ALUOp <= 5'b000010; //  add Code
           MulOp = 0;
+          jalBit = 0;
         end
         6'b001001: begin // addiu
         regDst <= 1;
@@ -84,6 +86,7 @@ module Controller(instruction, funct,
         zeroExtend = 1;
         ALUOp <= 5'b00111; // todo: Change to addu Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b011100: begin // special2  madd/msub
         regDst <= 0;
@@ -95,6 +98,7 @@ module Controller(instruction, funct,
         BranchJump <= 0;
         ALUOp <= 5'b01000; // 
         MulOp = 1;
+        jalBit = 0;
         end
         6'b011111: begin // special3  seb/seh
         regDst <= 0;
@@ -106,6 +110,7 @@ module Controller(instruction, funct,
         BranchJump <= 0;
         ALUOp <= 5'b01001; // 
         MulOp = 0;
+        jalBit = 0;
         end
         
 
@@ -123,6 +128,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b101011: begin // sw
         MemDataType <= 2'b10;
@@ -134,6 +140,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b100000: begin // lb
         MemDataType <= 2'b00;
@@ -147,6 +154,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b100001: begin //lh
         MemDataType <= 2'b01;
@@ -160,6 +168,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b101000: begin // sb
          MemDataType <= 2'b00;
@@ -171,6 +180,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b101001: begin // sh
         MemDataType <= 2'b01;
@@ -182,6 +192,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b001111: begin // lui
         MemDataType <= 2'b00;
@@ -195,6 +206,7 @@ module Controller(instruction, funct,
         zeroExtend = 0;
         ALUOp <= 5'b000010; // add Code
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000001: begin //
         ALUSource <= 0;
@@ -205,6 +217,7 @@ module Controller(instruction, funct,
         ALUOp <= 0; 
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000100: begin // beq
         ALUSource <= 0;
@@ -215,6 +228,7 @@ module Controller(instruction, funct,
         ALUOp <= 2'b01; // sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000101: begin // bne
         ALUSource <= 0;
@@ -225,6 +239,7 @@ module Controller(instruction, funct,
         ALUOp <= 2'b01; // sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000111: begin // bgtz
         ALUSource <= 0;
@@ -235,6 +250,7 @@ module Controller(instruction, funct,
         ALUOp <= 0; // todo: Change to sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000110: begin // blez
         ALUSource <= 0;
@@ -245,6 +261,7 @@ module Controller(instruction, funct,
         ALUOp <= 0; // todo: Change to sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000010: begin // j // reqires datapath modification
         ALUSource <= 0;
@@ -255,16 +272,18 @@ module Controller(instruction, funct,
         ALUOp <= 0; // todo: Change to sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b000011: begin // jal
         ALUSource <= 0;
-        regWrite <= 0;
+        regWrite <= 1;
         MemRead <= 0;
         MemWrite <= 0;
         BranchJump <= 3'b011;
-        ALUOp <= 0; // todo: Change to sub Code
+        ALUOp <= 5'b10000; // todo: Change to sub Code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 1;
         end
         6'b001100: begin // andi
         regDst <= 1;
@@ -277,6 +296,7 @@ module Controller(instruction, funct,
         ALUOp <= 5'b00001; // change to and code
         zeroExtend = 1;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b001101: begin // ori
         regDst <= 1;
@@ -289,6 +309,7 @@ module Controller(instruction, funct,
         ALUOp <= 5'b00011; // change to or code
         zeroExtend = 1;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b001110: begin // xori
         regDst <= 1;
@@ -301,6 +322,7 @@ module Controller(instruction, funct,
         ALUOp <= 5'b00100; // change to xor code
         zeroExtend = 1;
         MulOp = 0;
+        jalBit = 0;
         end
          6'b001010: begin // slti
         regDst <= 1;
@@ -313,6 +335,7 @@ module Controller(instruction, funct,
         ALUOp <= 5'b00101; // change to slt code
         zeroExtend = 0;
         MulOp = 0;
+        jalBit = 0;
         end
         6'b001011: begin // sltiu
         regDst <= 1;
@@ -325,6 +348,7 @@ module Controller(instruction, funct,
         ALUOp <= 5'b01011; // change to sltu code
         zeroExtend = 1;
         MulOp = 0;
+        jalBit = 0;
         end
             
     endcase

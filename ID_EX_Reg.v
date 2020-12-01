@@ -8,13 +8,13 @@
 
 module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtRegIn, RdRegIn,
                   regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, functIn,
-                 BranchJumpIn, ALUOpIn, clk, dataTypeIn,
+                 BranchJumpIn, ALUOpIn, jalBitIn, clk, dataTypeIn,
                   PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut, RsRegOut, RtRegOut, RdRegOut,
                    regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut, functOut,
-                  BranchJumpOut, ALUOpOut, dataTypeOut, flush);
+                  BranchJumpOut, ALUOpOut, jalBitOut, dataTypeOut, flush);
                   
                   
-                  input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, clk, flush;
+                  input regDstIn, ALUSourceIn, MemToRegIn, regWriteIn, MemReadIn, MemWriteIn, jalBitIn, clk, flush;
                   input [1:0] dataTypeIn;
                   input [31:0] PCAddResultIn, ReadData1In, ReadData2In, OffsetIn;
                   input [2:0] BranchJumpIn;
@@ -22,7 +22,7 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
 //                  input [15:0] ControlSig;
                   input [4:0] RsRegIn, RtRegIn,  RdRegIn;
                   input [5:0] functIn; 
-                  output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut;
+                  output reg regDstOut, ALUSourceOut, MemToRegOut, regWriteOut, MemReadOut, MemWriteOut, jalBitOut;
                   output reg [1:0] dataTypeOut;
                   output reg [31:0] PCAddResultOut, ReadData1Out, ReadData2Out, OffsetOut;
                   output reg [4:0] RsRegOut, RtRegOut, RdRegOut;
@@ -50,6 +50,7 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
         BranchJumpOut = 0;
         ALUOpOut = 0;
         functOut = 0;
+        jalBitOut = 0;
     end
     else begin
         dataTypeOut = dataTypeIn;
@@ -69,6 +70,7 @@ module ID_EX_Reg(PCAddResultIn, ReadData1In, ReadData2In, OffsetIn, RsRegIn, RtR
         BranchJumpOut = BranchJumpIn;
         ALUOpOut = ALUOpIn;
         functOut = functIn;
+        jalBitOut = jalBitIn;
         end
     end
 endmodule

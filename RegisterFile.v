@@ -70,14 +70,15 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
 
    // Read procedure
    always @(negedge Clk) begin
-      ReadData1 <= RegFile[ReadRegister1];
-      ReadData2 <= RegFile[ReadRegister2];
+       
+      ReadData1 <= RegFile[$unsigned(ReadRegister1)];
+      ReadData2 <= RegFile[$unsigned(ReadRegister2)];
    end
 
    // Write procedure
    always @(posedge Clk) begin
       if ((RegWrite == 1) & ~(WriteRegister == 0))
-         RegFile[WriteRegister] <= WriteData;
+         RegFile[$unsigned(WriteRegister)] <= WriteData;
    end
    
    assign debug_reg16 = RegFile[16];
