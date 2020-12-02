@@ -45,7 +45,7 @@ module InstructionMemory(Address, Instruction);
     integer i;
     /* Please fill in the implementation here */
     //Create 2D array for memory with 128 32-bit elements here
-         reg [31:0] memory [0:127];
+         reg [31:0] memory [0:255];
     
          initial begin                   //need to initalize this for the code!!!
 
@@ -124,7 +124,7 @@ module InstructionMemory(Address, Instruction);
         end
         
         always @ (Address) begin
-            Instruction <= memory[Address[8:2]];    
+            Instruction <= memory[Address[10:2]];    
         end
 
 endmodule

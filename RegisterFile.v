@@ -48,7 +48,7 @@
 // to allow for data multiplexing and setup time.
 ////////////////////////////////////////////////////////////////////////////////
 
-module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2, debug_reg16);
+module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2, debug_reg2, debug_reg3);
 
 	input [4:0] ReadRegister1;
 	input [4:0] ReadRegister2;
@@ -58,14 +58,17 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
 
 	input Clk, RegWrite;
 	integer i;
-	output [31:0] debug_reg16;
+	output [31:0] debug_reg2, debug_reg3;
 	
-	(* mark_debug = "true" *) reg [31:0] RegFile[0:31];
+    reg [31:0] RegFile[0:31];
+    
+    
 
    initial begin
        for(i=0; i<32; i = i+1) begin
           RegFile[i] <= 32'h0;
        end
+       RegFile[29] = 23000;
    end
 
    // Read procedure
@@ -81,6 +84,7 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
          RegFile[$unsigned(WriteRegister)] <= WriteData;
    end
    
-   assign debug_reg16 = RegFile[16];
+   assign debug_reg2 = RegFile[2];
+   assign debug_reg3 = RegFile[3];
 
 endmodule

@@ -56,6 +56,7 @@ module ForwardingUnit(
         ControlC <= 1;
         end
         else ControlC <= 0;
+        
         if (WBRegWrite & (~IDimmBit | IDMemWrite) & ~(WBrd == 0) & (WBrd == IDrt)) begin
             ControlD <= 1;
         end

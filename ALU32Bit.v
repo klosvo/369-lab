@@ -152,7 +152,15 @@ module ALU32Bit(ALUControl, A, B, regWrite, rs, LogicalOffset, ALUResult, Zero, 
 			5'b01001: begin 
 					ALUResult[31:0] <= A ^ B;	
 				  end 
-            5'b11111:  ALUResult <= ((B >> LogicalOffset) & {32{~B[31]}}) | (~(~B >> LogicalOffset) & {32{B[31]}}); //sra
+            5'b11111: begin
+                     if (B[31]) begin 
+                        ALUResult <= ~(~B >> LogicalOffset); //sra
+                    end
+                    else begin
+                        ALUResult <= (B >> LogicalOffset);
+                    end
+                    
+                end
             5'b01010: ALUResult <= ((B >> A) & {32{~B[31]}}) | (~(~B >> A) & {32{B[31]}});
 
 //			// DIVIDE                            

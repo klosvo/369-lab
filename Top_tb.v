@@ -32,9 +32,9 @@ module Top_tb(
 	
 	initial begin
 	reset = 0;
-        for (i = 0; i < 256; i = i+1) begin
-           #10 clk = 0;
-           #10 clk = 1;
+        for (i = 0; i < 1000000000; i = i+1) begin
+           #1 clk = 0;
+           #1 clk = 1;
         end
 	end
 	
