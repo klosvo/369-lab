@@ -78,9 +78,9 @@ module Top( input Clk, Reset,
     assign Debug_Write_Register = RegWriteData;
 
     // sevenSegment Display
-     //ClkDiv clock_divider (Clk, Reset, NewClk);
-     //Two4DigitDisplay two_4_digit_display(Clk, Debug_Program_Counter[15:0], Debug_Write_Register[15:0], out7, en_out);
-     assign NewClk = Clk;
+     ClkDiv clock_divider (Clk, Reset, NewClk);
+     Two4DigitDisplay two_4_digit_display(Clk, Debug_V0[15:0], Debug_V1[15:0], out7, en_out);
+     //assign NewClk = Clk;
      
    
         
