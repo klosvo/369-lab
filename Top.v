@@ -158,7 +158,7 @@ Mux32Bit2To1 jalDataMux(DataOut1, RegData1, PCAddResult, JalBit);
                         MemMemWrite, MemMemRead, PCSrc, DataType, MemMemToReg, MemMultBit, MemHiLoWrite, MemZero);
                         
     // Memory Access Stage
-   DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, DataType, MemReadData);
+   DataMemory datamemory(MemALUResult, MemReadData2, MemMemWrite, MemMemRead, DataType, MemReadData, clk);
    And regWriteAnd(MemZero, MemregWrite, MemRegWriteResult);
    
    multiplyUnit MU(MemMultResult, MulOut, HI, LO, MemHiLoWrite);
