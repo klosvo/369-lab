@@ -19,42 +19,46 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module HazardDetection(branch, IDEXMemRead, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, IFIDWrite, PCWrite, MulOp);
+module HazardDetection(branch, IDEXMemRead,IDEXregWrite, IDEXrd, IDEXrt, IFIDrs, IFIDrt, IFIDFlush, IDEXFlush, EXMEMFlush, IFIDWrite, PCWrite, MulOp);
 
     input [1:0] branch;
-    input IDEXMemRead, MulOp;
-    input [4:0] IDEXrt, IFIDrs, IFIDrt;
+    input IDEXMemRead, MulOp, IDEXregWrite;
+    input [4:0] IDEXrd, IDEXrt, IFIDrs, IFIDrt;
     
-    reg stallagain;
+        //reg mulStallCounter;IDEXregWrite, 
     
-    output reg IFIDFlush, IDEXFlush, IFIDWrite, PCWrite;
+    output reg IFIDFlush, IDEXFlush, EXMEMFlush, IFIDWrite, PCWrite;
     
-    initial begin
-        stallagain <= 0;
+        initial begin
         IFIDFlush <= 0;
         IDEXFlush <= 0;
         IFIDWrite <= 1;
         PCWrite <= 1;
+       // mulStallCounter <= 0;
+        
     end
     
     always @(*) begin
-        if ((IDEXMemRead & ((IDEXrt == IFIDrs) | (IDEXrt == IFIDrt))) | MulOp) begin
-                IFIDFlush <= 0;
-                IDEXFlush <= 1;
-                IFIDWrite <= 0;
-                PCWrite <= 0;
-        end 
-        else if (~(branch == 0) | stallagain) begin
-            IFIDWrite <= 1;
+        if (~(branch == 0)) begin
             IFIDFlush <= 1;
             IDEXFlush <= 1;
-            stallagain <= ~stallagain;
+            EXMEMFlush <= 1;
         end
+        else if ((IDEXMemRead & ((IDEXrt == IFIDrs) | (IDEXrt == IFIDrt))) | (IDEXregWrite & (MulOp & ((IDEXrd == IFIDrs) | (IDEXrd == IFIDrt))))) begin
+                IDEXFlush <= 1;
+                IFIDFlush <= 0;
+                IFIDWrite <= 0;
+                EXMEMFlush <= 0;
+                PCWrite <=0;
+                //mulStallCounter <= 1;
+        end 
         else begin
                 IFIDFlush <= 0;
                 IDEXFlush <= 0;
+                EXMEMFlush <= 0;
                 IFIDWrite <= 1;
                 PCWrite <= 1;
+               // mulStallCounter <= 0;
         end
 
     end          

@@ -36,8 +36,6 @@ module multiplyUnit( multResult, mulOut, HI_out, LO_out, regWrite);
             LO_out <= multResult[31:0];
         end
         else begin
-            HI_out <= 16'b0;
-            LO_out <= multResult[31:0];
             mulOut <= multResult[31:0];
         end
     end

@@ -1,12 +1,14 @@
 `timescale 1ns / 1ps
 
+
+//INCOMPLETE
 ////////////////////////////////////////////////////////////////////////////////
 // ECE369 - Computer Architecture
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
 module MEM_WB_Reg(MemReadDataIn, ALUResultIn, rdIn, MemToRegIn, RegWrite, clk,
-                  MemReadDataOut, ALUResultOut, rdOut, MemToRegOut, RegWriteOut);             
+                  MemReadDataOut, ALUResultOut, rdOut, MemToRegOut, RegWriteOut);
                   
                   input [31:0] MemReadDataIn, ALUResultIn;
                   input [4:0] rdIn;
@@ -16,15 +18,6 @@ module MEM_WB_Reg(MemReadDataIn, ALUResultIn, rdIn, MemToRegIn, RegWrite, clk,
                   output reg [4:0] rdOut;
                   output reg MemToRegOut, RegWriteOut;
                   
-      initial begin
-        MemReadDataOut <= 32'b0;
-        ALUResultOut <= 32'b0;
-        rdOut <= 5'b0;
-        MemToRegOut <= 0;
-        RegWriteOut <= 0;
-      end                  
-                  
-                  
       always @ (posedge clk) begin
         MemReadDataOut <= MemReadDataIn;
         ALUResultOut <= ALUResultIn;
@@ -32,5 +25,9 @@ module MEM_WB_Reg(MemReadDataIn, ALUResultIn, rdIn, MemToRegIn, RegWrite, clk,
         MemToRegOut <= MemToRegIn;
         RegWriteOut <= RegWrite;
       end
-     
+      
+      
+      // !!!!!!  I am a Purple Unicorn !!!!!
+
+
 endmodule
